@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Jack He</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<video autoplay loop muted playsinline id="background-video">
+    <source src="Wallpaper_Rollinghills_Day.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+
+<body>
+    <div style="
+        position: absolute; 
+        top:0;
+        left:0;
+        height: 26px; 
+        width: 100%; 
+        background-color: #c0c0c0; 
+        display: flex; 
+        justify-content: space-between;
+        align-items: center; 
+        ">
+
+        <p style=" margin-left: 5px; background-color: #d1d0d0; padding: 2px; padding-left: 5px; padding-right: 5px; border-radius: 5px;" > Logged in as: Vistor</p>
+        <p id="timeElement" style="margin-right: 5px; background-color: #d1d0d0; padding: 2px; padding-left: 5px; padding-right: 5px; border-radius: 5px;">Time</p>
+
+    </div>
+
+    <!--Introduction Window-->
+    <div id="welcome" style="
+    background-color: #c0c0c0; 
+    position: absolute; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+    padding: 16px; 
+    border: solid; 
+    border-color: #d1d0d0; 
+    width: 256px;">
+        <p id="welcomeheader"> 
+            Handle
+        </p>
+
+        <img style="
+        width: 128px; 
+        height: 128px; 
+        border-radius: 100px; 
+        border:solid; 
+        border-color: #d1d0d0; 
+        object-fit:cover;" 
+        
+        src="./f5e96e0bf8e810185062b4078562ced6.gif">
+    
+        <h1 style="margin: 4px;">'95 OS</h1>
+
+        <p>Seems like yesterday... <br />Developed by Jack He</p>
+
+        <a href="https://github.com/Darkest-Teddy">Github</a>
+    </div>
+
+    <script>
+        function updateTime() {
+            var currentTime = new Date().toLocaleString();
+
+            var timeText = document.querySelector("#timeElement");
+
+            timeText.innerHTML = currentTime
+        }
+
+        setInterval(updateTime, 1000);
+
+    </script>
+
+    <!--Links Javascript file-->
+    <script src="script.js"></script>
+</body>
+</html>
