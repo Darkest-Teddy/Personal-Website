@@ -8,7 +8,7 @@ function updateTime() {
 
 setInterval(updateTime, 1000);
 
-const draggableElements = document.querySelectorAll('.window');
+const draggableElements = document.querySelectorAll('.windowheader');
 draggableElements.forEach(function(elmnt) {
     dragElement(elmnt);
 });
