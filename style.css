@@ -16,3 +16,49 @@ body {
     object-fit: cover; /* Ensures the video covers the screen */
     z-index: -1; /* Keeps the video behind other content */
 }
+
+.window {
+    position: absolute;
+    z-index: 9;
+    background-color: #c0c0c0;
+    border-color: #d1d0d0;
+    text-align: center;
+
+    padding-top: 30px; /* Make space for the header */
+    padding-bottom: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.windowheader {
+    position: absolute;
+    width: 100%;
+    height: 20px;  /* Keep the header size */
+    top: 0;
+    left: 0;
+    padding: 0px;
+    cursor: move;
+    z-index: 10;
+    background-color: #0827f5;
+    color: #fff;
+    margin: 0;
+    text-align: center;
+    
+
+}
+
+/* Close button styles */
+.closeButton {
+    position: absolute;
+    top: 0;  /* Align with the top of the header */
+    right: 0; /* Stick to the right */
+    width: 20px;  /* Keep the button the same size as the header */
+    height: 20px; /* Keep the button the same size as the header */
+    background-color: #e2dfdf;
+    cursor: pointer;
+    z-index: 11;
+    text-align: center;
+    line-height: 18px; /* Ensures the text inside is centered vertically */
+    font-size: 15px; /* Adjust font size as needed */
+    margin: 0;
+    
+}
