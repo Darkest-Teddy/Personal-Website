@@ -64,6 +64,8 @@ function closeWindow(element) {
   
   function openWindow(element) {
     element.style.visibility = "visible"; // Makes the window visible again
+
+    positionWindow(element);
   }
   
   // Select the elements
@@ -79,3 +81,37 @@ function closeWindow(element) {
   welcomeScreenOpen.addEventListener("click", function() {
       openWindow(welcomeScreen);
   });
+
+// Function to adjust window's position to stay within the viewport
+function positionWindow(element) {
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+
+    // Get the current position and size of the window
+    let windowWidth = element.offsetWidth;
+    let windowHeight = element.offsetHeight;
+
+    let windowLeft = element.offsetLeft;
+    let windowTop = element.offsetTop;
+
+    // Adjust the position if the window is out of bounds
+    if (windowLeft + windowWidth > screenWidth) {
+      windowLeft = screenWidth - windowWidth; // Keep it within the right side
+    }
+
+    if (windowTop + windowHeight > screenHeight) {
+      windowTop = screenHeight - windowHeight; // Keep it within the bottom side
+    }
+
+    if (windowLeft < 0) {
+      windowLeft = 0; // Keep it within the left side
+    }
+
+    if (windowTop < 0) {
+      windowTop = 0; // Keep it within the top side
+    }
+
+    // Set the updated position
+    element.style.left = windowLeft + "px";
+    element.style.top = windowTop + "px";
+  }
