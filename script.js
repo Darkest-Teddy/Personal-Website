@@ -59,20 +59,23 @@ function dragElement(element) {
 }
 
 function closeWindow(element) {
-  element.style.display = "none"
-}
-
-function openWindow(element) {
-    element.style.display = "flex"
+    element.style.visibility = "hidden"; // Hides the window but keeps its size
   }
-var welcomeScreenClose = document.querySelector("#welcomeclose")
-
-var welcomeScreenOpen = document.querySelector("#welcomeopen")
-
-welcomeScreenClose.addEventListener("click", function() {
-    closeWindow(welcomeScreen);
-  });
   
+  function openWindow(element) {
+    element.style.visibility = "visible"; // Makes the window visible again
+  }
+  
+  // Select the elements
+  var welcomeScreen = document.querySelector("#welcomeScreen");
+  var welcomeScreenClose = document.querySelector("#welcomeclose");
+  var welcomeScreenOpen = document.querySelector("#welcomeopen");
+  
+  // Add event listeners
+  welcomeScreenClose.addEventListener("click", function() {
+      closeWindow(welcomeScreen);
+  });
+    
   welcomeScreenOpen.addEventListener("click", function() {
-    openWindow(welcomeScreen);
+      openWindow(welcomeScreen);
   });
