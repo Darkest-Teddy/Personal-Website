@@ -8,19 +8,23 @@ function updateTime() {
 
 setInterval(updateTime, 1000);
 
-const draggableElements = document.querySelectorAll('.windowheader');
-draggableElements.forEach(function(elmnt) {
-    dragElement(elmnt);
+const draggableElements = document.querySelectorAll('.window');
+draggableElements.forEach(function(element) {
+    dragElement(element);
 });
 
-function dragElement(elmnt) {
+function dragElement(element) {
     var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    if (document.getElementById(elmnt.className + "header")) {
-        // if present, the header is where you move the DIV from:
-        document.getElementById(elmnt.className + "header").onmousedown = dragMouseDown;
+
+    // Select the header by class within the current .window
+    const header = element.querySelector('.windowheader');
+    
+    if (header) {
+        // If the header is found, set up drag events on the header:
+        header.onmousedown = dragMouseDown;
     } else {
-        // otherwise, move the DIV from anywhere inside the DIV:
-        elmnt.onmousedown = dragMouseDown;
+        // Otherwise, set up drag events directly on the .window element
+        element.onmousedown = dragMouseDown;
     }
 
     function dragMouseDown(e) {
@@ -43,8 +47,8 @@ function dragElement(elmnt) {
         pos3 = e.clientX;
         pos4 = e.clientY;
         // set the element's new position:
-        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        element.style.top = (element.offsetTop - pos2) + "px";
+        element.style.left = (element.offsetLeft - pos1) + "px";
     }
 
     function closeDragElement() {
@@ -53,3 +57,22 @@ function dragElement(elmnt) {
         document.onmousemove = null;
     }
 }
+
+function closeWindow(element) {
+  element.style.display = "none"
+}
+
+function openWindow(element) {
+    element.style.display = "flex"
+  }
+var welcomeScreenClose = document.querySelector("#welcomeclose")
+
+var welcomeScreenOpen = document.querySelector("#welcomeopen")
+
+welcomeScreenClose.addEventListener("click", function() {
+    closeWindow(welcomeScreen);
+  });
+  
+  welcomeScreenOpen.addEventListener("click", function() {
+    openWindow(welcomeScreen);
+  });
