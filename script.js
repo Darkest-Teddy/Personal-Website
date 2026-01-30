@@ -1,3 +1,5 @@
+// Website clock
+
 function updateTime() {
   var currentTime = new Date().toLocaleString();
 
@@ -69,19 +71,36 @@ function closeWindow(element) {
   }
   
   // Select the elements
+
+  // Welcome window variables
   var welcomeScreen = document.querySelector("#welcomeScreen");
-  var welcomeScreenClose = document.querySelector("#welcomeclose");
   var welcomeScreenOpen = document.querySelector("#welcomeopen");
-  
-  // Add event listeners
-  welcomeScreenClose.addEventListener("click", function() {
-      closeWindow(welcomeScreen);
-  });
-    
+  var welcomeScreenClose = document.querySelector("#welcomeclose");
+
+  // Bank window variables
+  var bankScreen = document.querySelector("#bankScreen");
+  var bankScreenOpen = document.querySelector("#bankopen");
+  var bankScreenClose = document.querySelector("#bankclose");
+
+  // Welcome window event listeners
   welcomeScreenOpen.addEventListener("click", function() {
       openWindow(welcomeScreen);
   });
 
+  welcomeScreenClose.addEventListener("click", function() {
+      closeWindow(welcomeScreen);
+  });
+
+  // Bank window event listeners
+  bankScreenOpen.addEventListener("click", function() {
+      openWindow(bankScreen);
+  });
+
+  bankScreenClose.addEventListener("click", function() {
+      closeWindow(bankScreen);
+  });
+
+    
 // Function to adjust window's position to stay within the viewport
 function positionWindow(element) {
     const screenWidth = window.innerWidth;
