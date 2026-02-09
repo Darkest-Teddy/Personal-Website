@@ -4,7 +4,8 @@
 }
 
 body {
-    font-family:'W95FA'
+    font-family:'W95FA';
+    overflow-x: hidden;
 }
 
 #background-video {
