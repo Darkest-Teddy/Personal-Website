@@ -78,7 +78,7 @@ function closeWindow(element) {
   var welcomeScreenClose = document.querySelector("#welcomeclose");
 
   // Bank window variables
-  var bankScreen = document.querySelector("#bankScreen");
+  var bankScreen = document.querySelector("#bankscreen");
   var bankScreenOpen = document.querySelector("#bankopen");
   var bankScreenClose = document.querySelector("#bankclose");
 
