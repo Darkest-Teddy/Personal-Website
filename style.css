@@ -18,6 +18,16 @@ body {
     z-index: -1; /* Keeps the video behind other content */
 }
 
+#icon-grid {
+    position: absolute;
+    top: 40px;
+    left: 10px;
+    display: grid; /* Turns the element into a grid container - All children within it become grid items you can arrage in rows and columns */
+    grid-template-rows: repeat(5, auto); /* max 5 rows = 5 icons per column */
+    grid-auto-flow: column;              /* fill downward, then start a new column */
+    gap: 24px;
+}
+
 .window {
     position: absolute;
     z-index: 9;
@@ -60,6 +70,39 @@ body {
     font-size: 15px; /* Adjust font size as needed */
     margin: 0;
     
+}
+
+
+/* Reusable layout for icon + text error/dialog windows */
+.window-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 0 12px;
+}
+
+.window-message img {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+.window-message-text {
+    text-align: left;
+}
+
+.window-message-text p {
+    margin: 2px 0;
+}
+
+/* Default centered position - override per window with top/left if needed */
+.window-centered {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: solid;
+    border-color: #d1d0d0;
 }
 
 

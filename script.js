@@ -1,17 +1,24 @@
 // Website clock
 
 function updateTime() {
-  var currentTime = new Date().toLocaleString();
+  var now = new Date();
+  var datePart = now.toLocaleDateString();
+  var timePart = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 
   var timeText = document.querySelector("#timeElement");
 
-  timeText.innerHTML = currentTime
+  timeText.textContent = datePart + "  " + timePart;
 }
 
 setInterval(updateTime, 1000);
 
+let zCounter = 10;
+
 const draggableElements = document.querySelectorAll('.window');
 draggableElements.forEach(function(element) {
+    element.addEventListener('mousedown', function() {
+        element.style.zIndex = zCounter++;
+    });
     dragElement(element);
 });
 
@@ -67,7 +74,9 @@ function closeWindow(element) {
   function openWindow(element) {
     element.style.visibility = "visible"; // Makes the window visible again
 
-    positionWindow(element);
+    if (!element.style.left) {
+        positionWindow(element); // Only position on first open
+    }
   }
   
   // Select the elements
@@ -77,10 +86,24 @@ function closeWindow(element) {
   var welcomeScreenOpen = document.querySelector("#welcomeopen");
   var welcomeScreenClose = document.querySelector("#welcomeclose");
 
+  // About Me window variables
+  var aboutmeScreen = document.querySelector("#aboutmescreen");
+  var aboutmeScreenOpen = document.querySelector("#aboutmeopen");
+  var aboutmeScreenClose = document.querySelector("#aboutmeclose");
+
   // Bank window variables
   var bankScreen = document.querySelector("#bankscreen");
   var bankScreenOpen = document.querySelector("#bankopen");
   var bankScreenClose = document.querySelector("#bankclose");
+
+  // About Me window event listeners
+  aboutmeScreenOpen.addEventListener("click", function() {
+      openWindow(aboutmeScreen);
+  });
+
+  aboutmeScreenClose.addEventListener("click", function() {
+      closeWindow(aboutmeScreen);
+  });
 
   // Welcome window event listeners
   welcomeScreenOpen.addEventListener("click", function() {
@@ -92,8 +115,12 @@ function closeWindow(element) {
   });
 
   // Bank window event listeners
+  const bankErrorSound = new Audio("./sounds/Microsoft Windows 98 Error - QuickSounds (mp3cut.net).mp3");
+
   bankScreenOpen.addEventListener("click", function() {
       openWindow(bankScreen);
+      bankErrorSound.currentTime = 0;
+      bankErrorSound.play();
   });
 
   bankScreenClose.addEventListener("click", function() {
