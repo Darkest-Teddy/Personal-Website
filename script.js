@@ -91,6 +91,11 @@ function closeWindow(element) {
   var aboutmeScreenOpen = document.querySelector("#aboutmeopen");
   var aboutmeScreenClose = document.querySelector("#aboutmeclose");
 
+  // Projects window variables
+  var projectsScreen = document.querySelector("#projectsscreen");
+  var projectsScreenOpen = document.querySelector("#projectsopen");
+  var projectsScreenClose = document.querySelector("#projectsclose");
+
   // Bank window variables
   var bankScreen = document.querySelector("#bankscreen");
   var bankScreenOpen = document.querySelector("#bankopen");
@@ -112,6 +117,15 @@ function closeWindow(element) {
 
   welcomeScreenClose.addEventListener("click", function() {
       closeWindow(welcomeScreen);
+  });
+
+  // Projects window event listeners
+  projectsScreenOpen.addEventListener("click", function() {
+      openWindow(projectsScreen);
+  });
+
+  projectsScreenClose.addEventListener("click", function() {
+      closeWindow(projectsScreen);
   });
 
   // Bank window event listeners
