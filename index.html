@@ -9,8 +9,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-
-
 <body>
     <!--Wallpaper-->
     <video autoplay loop muted playsinline id="background-video">
@@ -18,252 +16,192 @@
         Your browser does not support the video tag.
     </video>
 
-    <!--Taskbar-->
-    <div style="
-        position: absolute; 
-        top:0;
-        left:0;
-        height: 26px; 
-        width: 100%; 
-        background-color: #c0c0c0; 
-        display: flex; 
-        justify-content: space-between;
-        align-items: center; ">
-
-        <p style=" margin-left: 5px;
-        background-color: #d1d0d0; 
-        padding: 2px; 
-        padding-left: 5px; 
-        padding-right: 5px; 
-        border-radius: 5px;" 
-        > Logged in as: Visitor</p>
-        <p id="timeElement" style="margin-right: 5px; background-color: #d1d0d0; padding: 2px; padding-left: 5px; padding-right: 5px; border-radius: 5px;">Time</p>
-
-    </div>
-
     <!--Introduction Window-->
-    <div class="window" id="welcomeScreen" style="
-    background-color: #c0c0c0; 
-
-    top: 50%; 
-    left: 50%; 
-    transform: translate(-50%, -50%); 
-
-    border: solid; 
-    border-color: #d1d0d0; 
-    width: 256px;">
-        <p class="windowheader"> 
-            Welcome
-        </p>
-
-        <p class="closeButton" id="welcomeclose">x</p>
-
-        <!--Border of image icon-->
-
-        <img style="
-        width: 128px; 
-        height: 128px; 
-        border-radius: 100px; 
-        border:solid; 
-        border-color: #d1d0d0; 
-        object-fit:cover;" 
-        
-        src="./images/car.gif">
-    
-        <h1 style="margin: 4px;">'95 OS</h1>
-
-        <p>Seems like yesterday... <br />Developed by Jack He</p>
-
-        <a href="https://github.com/Darkest-Teddy">Github</a>
+    <div class="window active" id="welcomeScreen" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 256px;">
+        <div class="titlebar">
+            <img class="titlebar-icon" src="./images/Computer Icon.png" alt="">
+            <span class="titlebar-text">Welcome</span>
+            <div class="titlebar-buttons">
+                <button class="tb-btn tb-min" data-action="minimize" aria-label="Minimize"><span></span></button>
+                <button class="tb-btn tb-max" data-action="maximize" aria-label="Maximize"><span></span></button>
+                <button class="tb-btn tb-close" data-action="close" aria-label="Close"><span>&times;</span></button>
+            </div>
+        </div>
+        <div class="window-body wb-pad">
+            <img style="width: 128px; height: 128px; border-radius: 100px; border: solid; border-color: #d1d0d0; object-fit: cover;" src="./images/car.gif">
+            <h1 style="margin: 4px;">'95 OS</h1>
+            <p>Seems like yesterday... <br />Developed by Jack He</p>
+            <a href="https://github.com/Darkest-Teddy" target="_blank">Github</a>
+        </div>
     </div>
 
     <!--About Me Window-->
-    <div class="window" id="aboutmescreen" style="top: 50%; left: 50%; transform: translate(-50%, -50%); border: solid; border-color: #d1d0d0; width: 700px; height: 400px; visibility: hidden;">
-        <p class="windowheader">About Me</p>
-        <p class="closeButton" id="aboutmeclose">x</p>
-
-        <div style="height: 100%; box-sizing: border-box; display: flex; flex-direction: row;">
-
-            <!-- Left half: space for future content -->
-            <div style="width: 50%; padding: 16px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center;">
-                <img style="
-                width: 128px;
-                height: 128px;
-                border: solid;
-                border-color: #d1d0d0;
-                object-fit: cover;
-                image-rendering: pixelated;"
-                src="./images/profile-pixel.png"
-                alt="Jack He">
+    <div class="window" id="aboutmescreen" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 700px; height: 400px; visibility: hidden;">
+        <div class="titlebar">
+            <img class="titlebar-icon" src="./images/msagent-3-hq.png" alt="">
+            <span class="titlebar-text">About Me</span>
+            <div class="titlebar-buttons">
+                <button class="tb-btn tb-min" data-action="minimize" aria-label="Minimize"><span></span></button>
+                <button class="tb-btn tb-max" data-action="maximize" aria-label="Maximize"><span></span></button>
+                <button class="tb-btn tb-close" data-action="close" aria-label="Close"><span>&times;</span></button>
             </div>
-
-            <!-- Right half: text -->
-            <div style="width: 50%; padding: 16px; box-sizing: border-box; overflow-y: auto; text-align: left; border-left: 1px solid #d1d0d0;">
-                <h2 style="margin: 0 0 8px 0;">Jack He</h2>
-                <p style="margin: 0 0 12px 0;">I'm Jack, a propspective software engineer currently studying Computer Science @ Boston University. I care about building things that actually matter: software with a real purpose and a little personality. I'm especially into machine learning, and I've spent a good chunk of time training custom AI models from scratch using online data and reinforced prompting. When I'm not deep in a codebase, I'm probably thinking about the next problem worth solving in the real world.</p>
-                <p style="margin: 0 0 12px 0;">I currently work as a software developer @ Honor Society of Cinematic Arts, building new, exciting interactive gaming and visual content for filmmaking students.</p>
-                <p style="margin: 0 0 12px 0;">As a first year, I have exercised my skills to build the impossible in a single day at many hackathons. I have competeted at Boston Hacks, BU's Data Science + X, and BU's Civic Hacks. Personally, I always felt the passion to push myself to go beyond academia and to persue ideas that challenge my thinking critically.</p>
-            </div>
-
         </div>
+        <div class="window-body">
+            <div style="height: 100%; box-sizing: border-box; display: flex; flex-direction: row;">
 
+                <!-- Left half: portrait -->
+                <div style="width: 50%; padding: 16px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center;">
+                    <img style="width: 128px; height: 128px; border: solid; border-color: #d1d0d0; object-fit: cover; image-rendering: pixelated;" src="./images/profile-pixel.png" alt="Jack He">
+                </div>
+
+                <!-- Right half: text -->
+                <div style="width: 50%; padding: 16px; box-sizing: border-box; overflow-y: auto; text-align: left; border-left: 1px solid #d1d0d0;">
+                    <h2 style="margin: 0 0 8px 0;">Jack He</h2>
+                    <p style="margin: 0 0 12px 0;">I'm Jack, a propspective software engineer currently studying Computer Science @ Boston University. I care about building things that actually matter: software with a real purpose and a little personality. I'm especially into machine learning, and I've spent a good chunk of time training custom AI models from scratch using online data and reinforced prompting. When I'm not deep in a codebase, I'm probably thinking about the next problem worth solving in the real world.</p>
+                    <p style="margin: 0 0 12px 0;">I currently work as a software developer @ Honor Society of Cinematic Arts, building new, exciting interactive gaming and visual content for filmmaking students.</p>
+                    <p style="margin: 0 0 12px 0;">As a first year, I have exercised my skills to build the impossible in a single day at many hackathons. I have competeted at Boston Hacks, BU's Data Science + X, and BU's Civic Hacks. Personally, I always felt the passion to push myself to go beyond academia and to persue ideas that challenge my thinking critically.</p>
+                </div>
+
+            </div>
+        </div>
     </div>
 
     <!--Projects Window-->
-    <div class="window" id="projectsscreen" style="top: 50%; left: 50%; transform: translate(-50%, -50%); border: solid; border-color: #d1d0d0; width: 720px; height: 480px; visibility: hidden;">
-        <p class="windowheader">Projects</p>
-        <p class="closeButton" id="projectsclose">x</p>
-
-        <div class="project-gallery">
-
-            <!-- Sapling -->
-            <div class="project-card">
-                <div class="project-card-title"><span class="dot" style="background:#3fb950;"></span>Sapling.exe</div>
-                <div class="project-thumb-wrap">
-                    <span class="ad-badge">&#9733; AWARD<br>WINNER! &#9733;</span>
-                    <img class="project-thumb" src="./images/thumb-sapling.png" alt="Sapling preview">
-                </div>
-                <div class="project-card-body">
-                    <p class="ad-headline">TURN YOUR NOTES INTO A GENIUS!</p>
-                    <p class="ad-copy">Drop in ANY document and watch an AI tutor + a LIVE knowledge graph grow your brain in real time. Studying never looked this good! &#10003; FREE to try!</p>
-                    <div class="project-meta">
-                        <span class="lang-tag"><span class="swatch" style="background:#3572A5;"></span>Python</span>
-                        <a class="win95-btn" href="https://github.com/SaplingLearn/Sapling" target="_blank">View &raquo;</a>
-                    </div>
-                </div>
+    <div class="window" id="projectsscreen" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 720px; height: 480px; visibility: hidden;">
+        <div class="titlebar">
+            <img class="titlebar-icon" src="./images/Projects-Folder.png" alt="">
+            <span class="titlebar-text">Projects</span>
+            <div class="titlebar-buttons">
+                <button class="tb-btn tb-min" data-action="minimize" aria-label="Minimize"><span></span></button>
+                <button class="tb-btn tb-max" data-action="maximize" aria-label="Maximize"><span></span></button>
+                <button class="tb-btn tb-close" data-action="close" aria-label="Close"><span>&times;</span></button>
             </div>
-
-            <!-- Super Artificial Bros. -->
-            <div class="project-card">
-                <div class="project-card-title"><span class="dot" style="background:#e34c26;"></span>SuperArtificialBros.exe</div>
-                <div class="project-thumb-wrap">
-                    <span class="ad-badge">&#9733; AWARD<br>WINNER! &#9733;</span>
-                    <img class="project-thumb" src="./images/thumb-mario.png" alt="Super Artificial Bros. preview">
-                </div>
-                <div class="project-card-body">
-                    <p class="ad-headline">INFINITE MARIO LEVELS, LIVE!</p>
-                    <p class="ad-copy">No two playthroughs ALIKE! AI builds whole worlds on the fly &amp; the NPCs actually REMEMBER you. Award-winning fun you have to see to believe!</p>
-                    <div class="project-meta">
-                        <span class="lang-tag"><span class="swatch" style="background:#f1e05a;"></span>JavaScript</span>
-                        <a class="win95-btn" href="https://github.com/Darkest-Teddy/DynamicMarioBros" target="_blank">View &raquo;</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stalk Market -->
-            <div class="project-card">
-                <div class="project-card-title"><span class="dot" style="background:#9d4edd;"></span>StalkMarket.exe</div>
-                <div class="project-thumb-wrap">
-                    <span class="ad-badge">&#9733; AWARD<br>WINNER! &#9733;</span>
-                    <img class="project-thumb" src="./images/thumb-stalk-market.png" alt="Stalk Market preview">
-                </div>
-                <div class="project-card-body">
-                    <p class="ad-headline">GET RICH, THE SAFE WAY!</p>
-                    <p class="ad-copy">Grow stocks like crops in a cozy garden and learn to invest with ZERO real-world risk! Powered by REAL market AI. Your portfolio will thank you!</p>
-                    <div class="project-meta">
-                        <span class="lang-tag"><span class="swatch" style="background:#3572A5;"></span>Python</span>
-                        <a class="win95-btn" href="https://github.com/Darkest-Teddy/StalkMarket" target="_blank">View &raquo;</a>
-                    </div>
-                </div>
-            </div>
-
         </div>
+        <div class="window-body">
+            <div class="project-gallery">
 
+                <!-- Sapling -->
+                <div class="project-card">
+                    <div class="project-card-title"><span class="dot" style="background:#3fb950;"></span>Sapling</div>
+                    <div class="project-thumb-wrap">
+                        <img class="project-thumb" src="./images/thumb-sapling.png" alt="Sapling preview">
+                    </div>
+                    <div class="project-card-body">
+                        <p>AI study platform powered by a dynamic neural knowledge graph. Turns your documents into a personal AI tutor with real-time knowledge visualization.</p>
+                        <div class="project-meta">
+                            <span class="lang-tag"><span class="swatch" style="background:#3572A5;"></span>Python</span>
+                            <a class="win95-btn" href="https://github.com/SaplingLearn/Sapling" target="_blank">View &raquo;</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Super Artificial Bros. -->
+                <div class="project-card">
+                    <div class="project-card-title"><span class="dot" style="background:#e34c26;"></span>Super Artificial Bros.</div>
+                    <div class="project-thumb-wrap">
+                        <img class="project-thumb" src="./images/thumb-mario.png" alt="Super Artificial Bros. preview">
+                    </div>
+                    <div class="project-card-body">
+                        <p>Super Mario Bros. reimagined with procedurally generated levels powered by Gemini and an AI relationship system that adapts gameplay to how you play.</p>
+                        <div class="project-meta">
+                            <span class="lang-tag"><span class="swatch" style="background:#f1e05a;"></span>JavaScript</span>
+                            <a class="win95-btn" href="https://github.com/Darkest-Teddy/DynamicMarioBros" target="_blank">View &raquo;</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stalk Market -->
+                <div class="project-card">
+                    <div class="project-card-title"><span class="dot" style="background:#9d4edd;"></span>Stalk Market</div>
+                    <div class="project-thumb-wrap">
+                        <img class="project-thumb" src="./images/thumb-stalk-market.png" alt="Stalk Market preview">
+                    </div>
+                    <div class="project-card-body">
+                        <p>An AI-powered investment learning game that simulates the stock market in a colorful, approachable way using hybrid pricing models and an ML risk engine.</p>
+                        <div class="project-meta">
+                            <span class="lang-tag"><span class="swatch" style="background:#3572A5;"></span>Python</span>
+                            <a class="win95-btn" href="https://github.com/Darkest-Teddy/StalkMarket" target="_blank">View &raquo;</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
 
     <!--Bank Account Window-->
-
-    <div class="window" id="bankscreen" style="top: 50%; left: 50%; transform: translate(-50%, -50%); border: solid; border-color: #d1d0d0; width: 550px; height: 50px; visibility: hidden;">
-
-        <p class="windowheader">RUNDLL</p>
-
-        <p class="closeButton" id="bankclose">x</p>
-
-        <div class="window-message">
-            <img src="./images/msg_error-0.png" alt="Error">
-            <div class="window-message-text">
-                <p>Error loading bankaccountinformation.exe</p>
-                <p>One of the library files needed to run this application cannot be found.</p>
+    <div class="window" id="bankscreen" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; visibility: hidden;">
+        <div class="titlebar">
+            <img class="titlebar-icon" src="./images/Money Icon.png" alt="">
+            <span class="titlebar-text">RUNDLL</span>
+            <div class="titlebar-buttons">
+                <button class="tb-btn tb-min" data-action="minimize" aria-label="Minimize"><span></span></button>
+                <button class="tb-btn tb-max" data-action="maximize" aria-label="Maximize"><span></span></button>
+                <button class="tb-btn tb-close" data-action="close" aria-label="Close"><span>&times;</span></button>
             </div>
         </div>
-
-  
-
+        <div class="window-body">
+            <div class="window-message">
+                <img src="./images/msg_error-0.png" alt="Error">
+                <div class="window-message-text">
+                    <p>Error loading bankaccountinformation.exe</p>
+                    <p>One of the library files needed to run this application cannot be found.</p>
+                </div>
+            </div>
+        </div>
     </div>
-    </div>
 
+    <!--Desktop icons-->
+    <div id="icon-grid">
 
-    <div id="icon-grid"> <!--Container for all icon divs-->
-
-        <!--Welcome Icon-->
-        <div class="icon">
-            <img 
-            style="
-            cursor: pointer;
-            width: 64px;
-            height: 64px;
-            margin-top: 15px;
-            margin-left: 15px;"
-            id="welcomeopen"
-            src="./images/Computer Icon.png">
-
-            <p style="color:aliceblue; text-align: center;" >Welcome</p>
-
+        <!--Welcome-->
+        <div class="icon" data-open="welcomeScreen">
+            <img src="./images/Computer Icon.png" alt="Welcome">
+            <p>Welcome</p>
         </div>
 
         <!--About Me-->
-        <div class="icon">
-            <img 
-            style="
-            cursor: pointer;
-            width: 64px;
-            height: 64px;
-            margin-top: 15px;
-            margin-left: 15px;
-            image-rendering: pixelated;"
-            id="aboutmeopen"
-            alt="About Me"
-            src="./images/msagent-3-hq.png">
-
-            <p style="color:aliceblue; text-align: center;" >About Me</p>
-
+        <div class="icon" data-open="aboutmescreen">
+            <img style="image-rendering: pixelated;" src="./images/msagent-3-hq.png" alt="About Me">
+            <p>About Me</p>
         </div>
 
         <!--Projects-->
-        <div class="icon" style="display: flex; flex-direction: column; align-items: center; width: 94px;">
-            <img
-            style="
-            cursor: pointer;
-            width: 64px;
-            height: 64px;
-            margin-top: 15px;
-            image-rendering: pixelated;"
-            id="projectsopen"
-            alt="Projects"
-            src="./images/Projects-Folder.png">
-
-            <p style="color:aliceblue; text-align: center; position: static; margin: 3px 0 0 0;" >Projects</p>
-
+        <div class="icon" data-open="projectsscreen">
+            <img style="image-rendering: pixelated;" src="./images/Projects-Folder.png" alt="Projects">
+            <p>Projects</p>
         </div>
 
-        <!--My Credit Card Information :troll:-->
-        <div class="icon">
-            <img
-            style="
-            cursor: pointer;
-            width: 64px;
-            height: 64px;
-            margin-top: 15px;
-            margin-left: 15px;"
-            id="bankopen"
-            src="./images/Money Icon.png">
-
-            <p style="color:aliceblue;  text-align: center;"
-            >My Bank<br>Account <br>Information</p>
+        <!--My Bank Account Information :troll:-->
+        <div class="icon" data-open="bankscreen">
+            <img src="./images/Money Icon.png" alt="My Bank Account Information">
+            <p>My Bank<br>Account<br>Information</p>
         </div>
 
+    </div>
 
+    <!--Taskbar (bottom)-->
+    <div id="taskbar">
+        <button id="start-button">
+            <img src="./images/Computer Icon.png" alt="">
+            <span>Start</span>
+        </button>
 
+        <nav id="start-menu" hidden>
+            <div class="start-banner"><span>'95 OS</span></div>
+            <ul class="start-list">
+                <li data-open="welcomeScreen"><img src="./images/Computer Icon.png" alt="">Welcome</li>
+                <li data-open="aboutmescreen"><img src="./images/msagent-3-hq.png" alt="">About Me</li>
+                <li data-open="projectsscreen"><img src="./images/Projects-Folder.png" alt="">Projects</li>
+                <li data-open="bankscreen"><img src="./images/Money Icon.png" alt="">My Bank Account</li>
+                <li class="start-sep"></li>
+                <li data-href="https://github.com/Darkest-Teddy"><img src="./images/Computer Icon.png" alt="">GitHub</li>
+            </ul>
+        </nav>
+
+        <div id="taskbar-windows"></div>
+
+        <div id="tray"><span id="timeElement">Time</span></div>
     </div>
 
     <!--Links Javascript file-->

@@ -4,8 +4,10 @@
 }
 
 body {
-    font-family:'W95FA';
-    overflow-x: hidden;
+    font-family: 'W95FA';
+    overflow: hidden;
+    margin: 0;
+    height: 100vh;
 }
 
 #background-video {
@@ -14,72 +16,192 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ensures the video covers the screen */
-    z-index: -1; /* Keeps the video behind other content */
+    object-fit: cover;        /* Ensures the video covers the screen */
+    z-index: -1;              /* Keeps the video behind other content */
 }
 
+/* ============================================================
+   Desktop icons
+   ============================================================ */
 #icon-grid {
     position: absolute;
-    top: 40px;
+    top: 12px;
     left: 10px;
-    display: grid; /* Turns the element into a grid container - All children within it become grid items you can arrage in rows and columns */
-    grid-template-rows: repeat(5, auto); /* max 5 rows = 5 icons per column */
-    grid-auto-flow: column;              /* fill downward, then start a new column */
-    gap: 24px;
+    display: grid;
+    grid-template-rows: repeat(5, auto);
+    grid-auto-flow: column;
+    gap: 18px;
 }
 
+.icon {
+    width: 84px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 4px;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.icon img {
+    width: 56px;
+    height: 56px;
+    pointer-events: none;
+}
+
+.icon p {
+    color: aliceblue;
+    text-align: center;
+    margin: 4px 0 0 0;
+    padding: 1px 3px;
+    font-size: 13px;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7);
+}
+
+.icon.selected img {
+    filter: drop-shadow(0 0 0 #000080);
+    background: rgba(0, 0, 64, 0.45);
+}
+
+.icon.selected p {
+    background: #000080;
+    color: #fff;
+    outline: 1px dotted #fff;
+}
+
+/* ============================================================
+   Windows  (authentic raised Win95 chrome)
+   ============================================================ */
 .window {
     position: absolute;
     z-index: 9;
     background-color: #c0c0c0;
-    border-color: #d1d0d0;
-    text-align: center;
-
-    padding-top: 30px; /* Make space for the header */
-    padding-bottom: 10px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    display: flex;
+    flex-direction: column;
+    padding: 3px;
+    /* double bevel: outer raised border + inner light/grey inset + drop shadow */
+    border: 2px solid;
+    border-color: #ffffff #404040 #404040 #ffffff;
+    box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080,
+                3px 3px 10px rgba(0, 0, 0, 0.35);
+    box-sizing: border-box;
 }
 
-.windowheader {
-    position: absolute;
-    width: 100%;
-    height: 20px;  /* Keep the header size */
-    top: 0;
-    left: 0;
-    padding: 0px;
-    z-index: 10;
-    background-color: #0827f5;
-    color: #fff;
-    margin: 0;
-    text-align: center;
-    
-
+/* Title bar */
+.titlebar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 22px;
+    padding: 0 2px;
+    flex-shrink: 0;
+    background: linear-gradient(90deg, #808080, #b5b5b5); /* inactive by default */
+    color: #d8d8d8;
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
-/* Close button styles */
-.closeButton {
-    position: absolute;
-    top: 0;  /* Align with the top of the header */
-    right: 0; /* Stick to the right */
-    width: 20px;  /* Keep the button the same size as the header */
-    height: 20px; /* Keep the button the same size as the header */
-    background-color: #e2dfdf;
+.window.active .titlebar {
+    background: linear-gradient(90deg, #000080, #1084d0);
+    color: #ffffff;
+}
+
+.titlebar-icon {
+    width: 16px;
+    height: 16px;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+}
+
+.titlebar-text {
+    flex: 1;
+    font-size: 13px;
+    font-weight: bold;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-left: 2px;
+}
+
+.titlebar-buttons {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+/* Title bar control buttons */
+.tb-btn {
+    width: 17px;
+    height: 15px;
+    padding: 0;
+    background: #c0c0c0;
+    border: 1px solid;
+    border-color: #ffffff #404040 #404040 #ffffff;
+    box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    z-index: 11;
-    text-align: center;
-    font-size: 15px; /* Adjust font size as needed */
-    margin: 0;
-    
+    color: #000;
 }
 
+.tb-btn:active {
+    border-color: #404040 #ffffff #ffffff #404040;
+    box-shadow: inset 1px 1px 0 #808080;
+}
+
+.tb-min span {
+    display: block;
+    width: 7px;
+    height: 2px;
+    background: #000;
+    margin-top: 6px;
+}
+
+.tb-max span {
+    display: block;
+    width: 9px;
+    height: 8px;
+    border: 1px solid #000;
+    border-top-width: 2px;
+    box-sizing: border-box;
+}
+
+.tb-close span {
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+/* Window body / content area */
+.window-body {
+    flex: 1;
+    overflow: auto;
+    background: #c0c0c0;
+    min-height: 0;
+}
+
+.window-body.wb-pad {
+    padding: 12px;
+    text-align: center;
+}
+
+/* sunken content well (text + galleries) */
+.sunken {
+    background: #ffffff;
+    box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #ffffff,
+                inset 2px 2px 0 #404040, inset -2px -2px 0 #dfdfdf;
+}
 
 /* Reusable layout for icon + text error/dialog windows */
 .window-message {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 12px;
-    padding: 0 12px;
+    padding: 16px 14px;
 }
 
 .window-message img {
@@ -96,23 +218,192 @@ body {
     margin: 2px 0;
 }
 
-/* Default centered position - override per window with top/left if needed */
-.window-centered {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border: solid;
-    border-color: #d1d0d0;
+/* ============================================================
+   Taskbar  (bottom)
+   ============================================================ */
+#taskbar {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 32px;
+    box-sizing: border-box;
+    background: #c0c0c0;
+    border-top: 2px solid #ffffff;
+    box-shadow: inset 0 1px 0 #dfdfdf;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px;
+    z-index: 10000;
 }
 
+#start-button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 25px;
+    padding: 0 7px;
+    font-family: 'W95FA';
+    font-size: 14px;
+    font-weight: bold;
+    background: #c0c0c0;
+    border: 2px solid;
+    border-color: #ffffff #404040 #404040 #ffffff;
+    box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080;
+    cursor: pointer;
+    flex-shrink: 0;
+}
 
-.icon  p {
+#start-button img {
+    width: 18px;
+    height: 18px;
+}
+
+#start-button.active {
+    border-color: #404040 #ffffff #ffffff #404040;
+    box-shadow: inset 1px 1px 0 #808080;
+}
+
+/* Open-window buttons */
+#taskbar-windows {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    flex: 1;
+    overflow: hidden;
+    margin-left: 4px;
+}
+
+.taskbar-win-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 25px;
+    min-width: 120px;
+    max-width: 165px;
+    padding: 0 7px;
+    background: #c0c0c0;
+    border: 2px solid;
+    border-color: #ffffff #404040 #404040 #ffffff;
+    box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080;
+    font-family: 'W95FA';
+    font-size: 12px;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.taskbar-win-btn img {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    image-rendering: pixelated;
+}
+
+.taskbar-win-btn span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.taskbar-win-btn.active {
+    border-color: #404040 #ffffff #ffffff #404040;
+    box-shadow: inset 1px 1px 0 #808080;
+    background: #b8b8b8;
+    font-weight: bold;
+}
+
+/* System tray / clock */
+#tray {
+    margin-left: auto;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    padding: 0 9px;
+    font-size: 13px;
+    border: 1px solid;
+    border-color: #808080 #ffffff #ffffff #808080;
+    box-shadow: inset 1px 1px 0 #404040;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   Start menu
+   ============================================================ */
+#start-menu {
     position: absolute;
-    margin-top: 3px;
-    margin-left: 15px;
+    bottom: 32px;
+    left: 3px;
+    width: 230px;
+    background: #c0c0c0;
+    border: 2px solid;
+    border-color: #ffffff #404040 #404040 #ffffff;
+    box-shadow: inset 1px 1px 0 #dfdfdf, 4px 4px 10px rgba(0, 0, 0, 0.45);
+    display: flex;
+    z-index: 10001;
 }
 
-/* ---- Projects gallery (Windows 95 styled cards) ---- */
+#start-menu[hidden] {
+    display: none;
+}
+
+.start-banner {
+    width: 30px;
+    background: linear-gradient(180deg, #000080, #1084d0);
+    flex-shrink: 0;
+}
+
+.start-banner span {
+    display: block;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    color: #fff;
+    font-weight: bold;
+    font-size: 20px;
+    padding: 10px 5px;
+    white-space: nowrap;
+    letter-spacing: 2px;
+}
+
+.start-list {
+    list-style: none;
+    margin: 0;
+    padding: 3px;
+    flex: 1;
+}
+
+.start-list li {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.start-list li img {
+    width: 26px;
+    height: 26px;
+    image-rendering: pixelated;
+}
+
+.start-list li:not(.start-sep):hover {
+    background: #000080;
+    color: #fff;
+}
+
+.start-sep {
+    height: 0;
+    padding: 0;
+    margin: 4px 3px;
+    border-top: 1px solid #808080;
+    border-bottom: 1px solid #ffffff;
+    pointer-events: none;
+}
+
+/* ============================================================
+   Projects gallery (clean Win95 program entries)
+   ============================================================ */
 .project-gallery {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -122,8 +413,8 @@ body {
     height: 100%;
     overflow-y: auto;
     text-align: left;
-    /* sunken "well" look for the gallery area */
     background-color: #c0c0c0;
+    /* sunken "well" look for the gallery area */
     box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #ffffff,
                 inset 2px 2px 0 #404040, inset -2px -2px 0 #dfdfdf;
 }
@@ -139,9 +430,10 @@ body {
 }
 
 .project-card-title {
-    background: linear-gradient(90deg, #0827f5, #5a73ff);
+    background: linear-gradient(90deg, #000080, #1084d0);
     color: #fff;
     font-size: 13px;
+    font-weight: bold;
     padding: 3px 6px;
     display: flex;
     align-items: center;
@@ -152,12 +444,10 @@ body {
     width: 8px;
     height: 8px;
     flex-shrink: 0;
-    box-shadow: inset 1px 1px 0 rgba(255,255,255,0.6);
+    box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.6);
 }
 
-/* Thumbnail with retro-ad starburst overlay */
 .project-thumb-wrap {
-    position: relative;
     margin: 3px 0;
     /* sunken bevel framing the "screenshot" */
     box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #ffffff,
@@ -172,53 +462,17 @@ body {
     object-fit: cover;
 }
 
-.ad-badge {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    z-index: 2;
-    background: #ffe000;
-    color: #d40000;
-    font-size: 9px;
-    font-weight: bold;
-    line-height: 1.05;
-    text-align: center;
-    padding: 5px 6px;
-    border: 1px solid #d40000;
-    transform: rotate(11deg);
-    box-shadow: 1px 1px 0 rgba(0,0,0,0.4);
-    text-transform: uppercase;
-}
-
 .project-card-body {
     flex: 1;
     padding: 7px;
     font-size: 12px;
-    line-height: 1.3;
+    line-height: 1.35;
     display: flex;
     flex-direction: column;
 }
 
-.ad-headline {
-    margin: 0 0 5px 0;
-    font-size: 12px;
-    font-weight: bold;
-    color: #d40000;
-    text-transform: uppercase;
-    line-height: 1.1;
-    text-shadow: 1px 1px 0 #ffe000;
-}
-
-.ad-copy {
-    margin: 0 0 8px 0;
-    flex: 1;
-}
-
 .project-card-body p {
     margin: 0 0 8px 0;
-}
-
-.ad-copy {
     flex: 1;
 }
 
