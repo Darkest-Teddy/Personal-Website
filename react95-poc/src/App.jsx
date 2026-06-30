@@ -213,26 +213,6 @@ const FolderIcon = styled.div`
   }
 `;
 
-const Thumb = styled.img`
-  display: block;
-  width: 100%;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-`;
-
-const LangTag = styled.span`
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  i {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    display: inline-block;
-  }
-`;
-
 /* ==================================================================
    90s-ad styled-components (project pop-up bodies)
    Fonts use !important to override the global W95FA rule.
@@ -927,25 +907,75 @@ function AboutBody() {
   );
 }
 
-/* A single project's body — used as the content of each spawned project window.
-   No inner frame/border: the content sits directly in the one window. */
-function ProjectCard({ project: p }) {
+/* A single project's body, rendered as a 90s pop-up ad. Reads project.ad for
+   copy/theme and the real project fields for the informative panel + CTA. */
+function ProjectAd({ project: p }) {
+  const ad = p.ad;
+  const t = ad.theme;
+  const Widget =
+    ad.genre === "sapling" ? KnowledgeGraph :
+    ad.genre === "mario" ? RelationshipMeter : RiskGauge;
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", boxSizing: "border-box", padding: 8 }}>
-      <Frame variant="well" style={{ padding: 2 }}>
-        <Thumb src={p.img} alt={p.name} />
-      </Frame>
-      <p style={{ fontSize: 12, lineHeight: 1.35, flex: 1, margin: "8px 2px" }}>{p.desc}</p>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 2px" }}>
-        <LangTag>
-          <i style={{ background: p.langColor }} />
-          {p.lang}
-        </LangTag>
-        <Button size="sm" onClick={() => window.open(p.url, "_blank")}>
-          View »
-        </Button>
-      </div>
-    </div>
+    <AdRoot $body={t.body}>
+      <AdAddr>
+        <span style={{ fontSize: 11 }}>🌐</span>
+        <AdUrl>{ad.junkUrl}</AdUrl>
+        <AdGo>Go</AdGo>
+      </AdAddr>
+
+      {ad.genre === "stalk" && (
+        <AdTicker><span>▲ YOU +999%　▲ practice cash　▲ no real money　▲ learn to invest　▲ YOU +999%</span></AdTicker>
+      )}
+
+      <AdScroll>
+        <AdSeal
+          $bg={t.sealBg}
+          $fg={ad.genre === "stalk" ? "#5a189a" : "#fff"}
+          $side={ad.genre === "mario" ? "left" : "right"}
+          $top={ad.genre === "stalk" ? "54px" : "34px"}
+        >
+          {ad.sealText}
+        </AdSeal>
+
+        <AdHook $color={t.hookColor} $font={t.hookFont}>{ad.hook}</AdHook>
+        {ad.sub && <AdSub style={{ color: ad.genre === "stalk" ? "#7CFC9A" : t.hookColor }}>{ad.sub}</AdSub>}
+
+        <AdShot>
+          {ad.genre === "mario" && (
+            <AdHud><span>★ × ∞</span><span>🪙 99</span></AdHud>
+          )}
+          {ad.genre === "stalk" && (
+            <AdHud><span>PORTFOLIO ▲ +999%</span><span>$5,000</span></AdHud>
+          )}
+          <img src={p.img} alt={p.name} />
+        </AdShot>
+
+        <Widget />
+
+        <AdInfo style={ad.genre === "stalk" ? { background: "#1c0530", borderColor: "#ffd83d", color: "#fff" } : undefined}>
+          <b style={ad.genre === "stalk" ? { color: "#ffd83d" } : undefined}>{p.name}</b>
+          {p.desc}
+          <AdSpecs>
+            {ad.bullets.map((b) => <li key={b}>{b}</li>)}
+          </AdSpecs>
+          <AdReq>BUILT WITH: ▶ {p.lang}</AdReq>
+        </AdInfo>
+
+        <AdCta $cta={t.cta} href={p.url} target="_blank" rel="noreferrer"
+          style={ad.genre === "mario" ? { color: "#7a2d00", fontFamily: '"Comic Sans MS", Arial' } : undefined}>
+          {ad.ctaLabel}
+          <small>{ad.ctaSub}</small>
+        </AdCta>
+
+        <AdLegal>{ad.legal}</AdLegal>
+      </AdScroll>
+
+      <AdStatus>
+        <span className="bk">{ad.statusText}</span>
+        <span className="net">🌐 Internet</span>
+      </AdStatus>
+    </AdRoot>
   );
 }
 
@@ -981,9 +1011,9 @@ const BODIES = {
   about: <AboutBody />,
   projects: <ProjectsBody />,
   bank: <BankBody />,
-  sapling: <ProjectCard project={PROJECTS.find((p) => p.id === "sapling")} />,
-  mario: <ProjectCard project={PROJECTS.find((p) => p.id === "mario")} />,
-  stalk: <ProjectCard project={PROJECTS.find((p) => p.id === "stalk")} />,
+  sapling: <ProjectAd project={PROJECTS.find((p) => p.id === "sapling")} />,
+  mario: <ProjectAd project={PROJECTS.find((p) => p.id === "mario")} />,
+  stalk: <ProjectAd project={PROJECTS.find((p) => p.id === "stalk")} />,
 };
 
 /* ==================================================================
