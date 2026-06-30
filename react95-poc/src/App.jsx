@@ -635,14 +635,19 @@ const BODIES = {
    App + window manager
 ================================================================== */
 export default function App() {
-  const [wins, setWins] = useState({
-    welcome: { open: true, min: false, max: false, x: 60, y: 40, z: 10, prev: null },
-    about: { open: false, min: false, max: false, x: 140, y: 70, z: 1, prev: null },
-    projects: { open: false, min: false, max: false, x: 200, y: 90, z: 1, prev: null },
-    bank: { open: false, min: false, max: false, x: 320, y: 160, z: 1, prev: null },
-    sapling: { open: false, min: false, max: false, x: 0, y: 0, z: 1, prev: null },
-    mario: { open: false, min: false, max: false, x: 0, y: 0, z: 1, prev: null },
-    stalk: { open: false, min: false, max: false, x: 0, y: 0, z: 1, prev: null },
+  const [wins, setWins] = useState(() => {
+    // Center the Welcome window on load (width known; height ~300 estimated).
+    const wx = Math.max(8, Math.round((window.innerWidth - APPS.welcome.width) / 2));
+    const wy = Math.max(8, Math.round((window.innerHeight - TASKBAR_H - 300) / 2));
+    return {
+      welcome: { open: true, min: false, max: false, x: wx, y: wy, z: 10, prev: null },
+      about: { open: false, min: false, max: false, x: 140, y: 70, z: 1, prev: null },
+      projects: { open: false, min: false, max: false, x: 200, y: 90, z: 1, prev: null },
+      bank: { open: false, min: false, max: false, x: 320, y: 160, z: 1, prev: null },
+      sapling: { open: false, min: false, max: false, x: 0, y: 0, z: 1, prev: null },
+      mario: { open: false, min: false, max: false, x: 0, y: 0, z: 1, prev: null },
+      stalk: { open: false, min: false, max: false, x: 0, y: 0, z: 1, prev: null },
+    };
   });
   const [activeId, setActiveId] = useState("welcome");
   const [startOpen, setStartOpen] = useState(false);
