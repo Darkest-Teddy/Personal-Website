@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
+import styled, { createGlobalStyle, ThemeProvider, keyframes } from "styled-components";
 import {
   styleReset,
   Window,
@@ -233,6 +233,286 @@ const LangTag = styled.span`
   }
 `;
 
+/* ==================================================================
+   90s-ad styled-components (project pop-up bodies)
+   Fonts use !important to override the global W95FA rule.
+================================================================== */
+const blink = keyframes`50% { opacity: 0; }`;
+const marquee = keyframes`from { transform: translateX(100%); } to { transform: translateX(-100%); }`;
+
+/* Wrapper: owns the per-project body background + base ad font. */
+const AdRoot = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: Arial, Helvetica, sans-serif !important;
+  color: #000;
+  background: ${(p) => p.$body};
+`;
+
+const AdScroll = styled.div`
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 9px 10px;
+  position: relative;
+`;
+
+const AdAddr = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 5px;
+  background: #c0c0c0;
+  border-bottom: 1px solid #808080;
+  flex-shrink: 0;
+`;
+const AdUrl = styled.span`
+  flex: 1;
+  background: #fff;
+  border: 1px solid;
+  border-color: #808080 #fff #fff #808080;
+  font-family: "Courier New", monospace !important;
+  font-size: 11px;
+  padding: 2px 5px;
+  color: #444;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+const AdGo = styled.span`
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  background: #c0c0c0;
+  border: 1px solid;
+  border-color: #fff #000 #000 #fff;
+`;
+
+const AdTicker = styled.div`
+  background: #000;
+  color: #7cfc9a;
+  font-family: "Courier New", monospace !important;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 0;
+  overflow: hidden;
+  white-space: nowrap;
+  flex-shrink: 0;
+  span { display: inline-block; animation: ${marquee} 9s linear infinite; }
+  @media (prefers-reduced-motion: reduce) { span { animation: none; } }
+`;
+
+const AdHook = styled.h2`
+  margin: 0;
+  text-align: center;
+  text-transform: uppercase;
+  line-height: 1.02;
+  white-space: pre-line;
+  font-size: 23px;
+  font-weight: 900;
+  color: ${(p) => p.$color};
+  font-family: ${(p) => p.$font} !important;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.6);
+`;
+const AdSub = styled.p`
+  margin: 3px 0 6px;
+  text-align: center;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 12px;
+  font-family: Georgia, serif !important;
+`;
+
+const AdShot = styled.div`
+  position: relative;
+  border: 2px solid;
+  border-color: #808080 #fff #fff #808080;
+  background: #000;
+  img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+`;
+const AdHud = styled.div`
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  right: 4px;
+  display: flex;
+  justify-content: space-between;
+  font-family: "Courier New", monospace !important;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 1px 1px 0 #000;
+  pointer-events: none;
+`;
+
+const AdInfo = styled.div`
+  background: #fffef0;
+  border: 1px solid #000;
+  padding: 7px 9px;
+  margin: 8px 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #111;
+  b { display: block; margin-bottom: 3px; }
+`;
+const AdSpecs = styled.ul`
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  line-height: 1.5;
+  li { padding-left: 16px; position: relative; }
+  li:before { content: "\\2714"; position: absolute; left: 0; color: #0a8f2a; font-weight: 700; }
+`;
+const AdReq = styled.div`
+  font-family: "Courier New", monospace !important;
+  font-size: 11px;
+  margin-top: 6px;
+`;
+
+const AdCta = styled.a`
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  margin-top: 9px;
+  font-size: 16px;
+  font-weight: 900;
+  padding: 8px;
+  color: #fff;
+  border: 2px solid;
+  border-color: #fff #000 #000 #fff;
+  cursor: pointer;
+  background: ${(p) => p.$cta};
+  small { display: block; font-size: 10px; font-weight: 400; opacity: 0.9; }
+`;
+
+const AdLegal = styled.div`
+  font-size: 9px;
+  color: #555;
+  margin-top: 6px;
+  line-height: 1.3;
+`;
+
+const AdStatus = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 6px;
+  font-size: 11px;
+  color: #000;
+  border-top: 1px solid #808080;
+  background: #c0c0c0;
+  flex-shrink: 0;
+  .net { margin-left: auto; }
+  .bk { animation: ${blink} 1s steps(1) infinite; }
+  @media (prefers-reduced-motion: reduce) { .bk { animation: none; } }
+`;
+
+const AdSeal = styled.div`
+  position: absolute;
+  width: 74px;
+  height: 74px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 0.95;
+  padding: 6px;
+  z-index: 3;
+  clip-path: polygon(50% 0,61% 18%,82% 12%,77% 33%,98% 38%,82% 53%,97% 70%,75% 70%,77% 92%,57% 80%,50% 100%,43% 80%,23% 92%,25% 70%,3% 70%,18% 53%,2% 38%,23% 33%,18% 12%,39% 18%);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+  background: ${(p) => p.$bg};
+  color: ${(p) => p.$fg || "#fff"};
+  top: ${(p) => p.$top || "34px"};
+  ${(p) => (p.$side === "left" ? "left: 6px; transform: rotate(11deg);" : "right: 6px; transform: rotate(-12deg);")}
+`;
+
+/* shared widget shell */
+const AdWidget = styled.div`
+  border: 1px solid #000;
+  margin: 8px 0;
+  padding: 6px 8px;
+  font-size: 11px;
+  background: ${(p) => p.$bg};
+  color: ${(p) => p.$fg};
+  border-color: ${(p) => p.$border || "#000"};
+  .wlabel { font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+`;
+
+/* Sapling: a small static "live knowledge graph" — round = concepts, square = docs. */
+function KnowledgeGraph() {
+  const nodeStyle = (l, t, doc) => ({
+    position: "absolute",
+    left: l,
+    top: t,
+    width: doc ? 15 : 11,
+    height: doc ? 15 : 11,
+    borderRadius: doc ? 2 : "50%",
+    background: doc ? "#ffd83d" : "#7CFC9A",
+    boxShadow: `0 0 6px ${doc ? "#ffd83d" : "#7CFC9A"}`,
+  });
+  return (
+    <AdWidget $bg="#0c3d1c" $fg="#bdf5c8" $border="#16a34a">
+      <div className="wlabel">▶ live knowledge graph — building…</div>
+      <div style={{ position: "relative", height: 64 }}>
+        <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
+          {[
+            [20, 14, 64, 40], [64, 40, 130, 18], [64, 40, 120, 56],
+            [20, 14, 170, 30], [120, 56, 180, 50],
+          ].map(([x1, y1, x2, y2], i) => (
+            <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#3fb950" strokeWidth="1.5" opacity="0.7" />
+          ))}
+        </svg>
+        <span style={nodeStyle(12, 8, true)} />
+        <span style={nodeStyle(60, 35, false)} />
+        <span style={nodeStyle(126, 13, false)} />
+        <span style={nodeStyle(116, 51, false)} />
+        <span style={nodeStyle(172, 25, true)} />
+      </div>
+    </AdWidget>
+  );
+}
+
+/* Mario: AI-relationship heart meter + spinning levels-generated counter. */
+function RelationshipMeter() {
+  return (
+    <AdWidget $bg="#1a1230" $fg="#ffd83d" $border="#000">
+      <div className="wlabel">🤖 your A.I. buddy likes how you play</div>
+      <span style={{ color: "#ff4d6d", letterSpacing: 2, fontSize: 14 }}>❤ ❤ ❤ ❤ ♡</span>
+      &nbsp;·&nbsp;
+      <span style={{
+        fontFamily: '"Courier New", monospace', fontWeight: 900, fontSize: 13,
+        color: "#fff", background: "#000", padding: "2px 5px",
+      }}>
+        LEVELS GENERATED: 9,999,999
+      </span>
+    </AdWidget>
+  );
+}
+
+/* Stalk: rising portfolio chart + ML risk-engine gauge. */
+function RiskGauge() {
+  return (
+    <AdWidget $bg="#12041f" $fg="#fff" $border="#ffd83d"
+      style={{ display: "flex", gap: 8, alignItems: "center" }}>
+      <svg viewBox="0 0 88 46" preserveAspectRatio="none"
+        style={{ flex: "0 0 88px", height: 46, background: "#000", border: "1px solid #2a0a45" }}>
+        <polyline points="2,42 18,36 34,38 50,22 66,26 86,4" fill="none" stroke="#7CFC9A" strokeWidth="2" />
+      </svg>
+      <div style={{ flex: 1 }}>
+        <div className="wlabel">🧠 ML risk engine</div>
+        <div>RISK: LOW</div>
+        <div style={{ height: 9, background: "#2a0a45", border: "1px solid #000", marginTop: 3 }}>
+          <div style={{ height: "100%", width: "25%", background: "linear-gradient(90deg,#7CFC9A,#ffd83d)" }} />
+        </div>
+      </div>
+    </AdWidget>
+  );
+}
+
 /* ---- Taskbar ----
    React95 AppBar/Toolbar + md Buttons default to ~44px tall (button height 36px,
    Toolbar padding 4px). The original taskbar is 32px: 25px controls + 3px padding.
@@ -294,9 +574,9 @@ const APPS = {
   about: { title: "About Me", icon: "/msagent.png", width: 700, height: 400, pixel: true },
   projects: { title: "Projects", icon: "/projects.png", width: 420, height: 220, pixel: true },
   bank: { title: "RUNDLL", icon: "/money.png", width: 420, sound: true },
-  sapling: { title: "Sapling", icon: "/projects.png", width: 300, height: 360, pixel: true },
-  mario: { title: "Super Artificial Bros.", icon: "/projects.png", width: 300, height: 360, pixel: true },
-  stalk: { title: "Stalk Market", icon: "/projects.png", width: 300, height: 360, pixel: true },
+  sapling: { title: "Sapling", icon: "/projects.png", width: 330, height: 500, pixel: true },
+  mario: { title: "Super Artificial Bros.", icon: "/projects.png", width: 330, height: 500, pixel: true },
+  stalk: { title: "Stalk Market", icon: "/projects.png", width: 330, height: 500, pixel: true },
 };
 
 /* Project windows that spawn (at random on-screen spots) when Projects is opened. */
