@@ -104,7 +104,7 @@ const GradientHeader = styled(WindowHeader)`
   font-size: 13px;
   background: ${(p) =>
     p.$active
-      ? "linear-gradient(90deg, #000080, #1084d0)"
+      ? (p.$activeBg || "linear-gradient(90deg, #000080, #1084d0)")
       : "linear-gradient(90deg, #808080, #b5b5b5)"};
 
   && button {
@@ -727,6 +727,7 @@ function spawnPosition(width, height, placed) {
 function Win95Window({ id, win, active, onFocus, onClose, onMin, onMax, onMove, onResize, children }) {
   const app = APPS[id];
   const isProject = PROJECT_IDS.includes(id); // project pop-ups: close-only, no scrollbar
+  const projectAd = isProject ? PROJECTS.find((pp) => pp.id === id)?.ad : null;
   const dragging = useRef(null);
   const resizing = useRef(null);
   const winRef = useRef(null);
@@ -811,12 +812,13 @@ function Win95Window({ id, win, active, onFocus, onClose, onMin, onMax, onMove, 
       <GradientHeader
         active={active}
         $active={active}
+        $activeBg={projectAd?.theme.header}
         onMouseDown={onHeaderMouseDown}
         onDoubleClick={() => onMax(id)}
       >
         <TitleText>
           <img src={app.icon} alt="" />
-          {app.title}
+          {projectAd ? projectAd.windowTitle : app.title}
         </TitleText>
         <TitleButtons>
           {!isProject && <Button onClick={() => onMin(id)}><MinGlyph /></Button>}
