@@ -233,7 +233,8 @@ const AdRoot = styled.div`
 const AdScroll = styled.div`
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 9px 10px;
   position: relative;
 `;
@@ -309,7 +310,7 @@ const AdShot = styled.div`
   border: 2px solid;
   border-color: #808080 #fff #fff #808080;
   background: #000;
-  img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+  img { display: block; width: 100%; height: 132px; object-fit: cover; }
 `;
 const AdHud = styled.div`
   position: absolute;
@@ -554,9 +555,9 @@ const APPS = {
   about: { title: "About Me", icon: "/msagent.png", width: 700, height: 400, pixel: true },
   projects: { title: "Projects", icon: "/projects.png", width: 420, height: 220, pixel: true },
   bank: { title: "RUNDLL", icon: "/money.png", width: 420, sound: true },
-  sapling: { title: "Sapling", icon: "/projects.png", width: 330, height: 500, pixel: true },
-  mario: { title: "Super Artificial Bros.", icon: "/projects.png", width: 330, height: 500, pixel: true },
-  stalk: { title: "Stalk Market", icon: "/projects.png", width: 330, height: 500, pixel: true },
+  sapling: { title: "Sapling", icon: "/projects.png", width: 330, height: 700, pixel: true },
+  mario: { title: "Super Artificial Bros.", icon: "/projects.png", width: 330, height: 700, pixel: true },
+  stalk: { title: "Stalk Market", icon: "/projects.png", width: 330, height: 700, pixel: true },
 };
 
 /* Project windows that spawn (at random on-screen spots) when Projects is opened. */
