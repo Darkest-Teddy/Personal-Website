@@ -328,14 +328,14 @@ const AdHud = styled.div`
 `;
 
 const AdInfo = styled.div`
-  background: #fffef0;
-  border: 1px solid #000;
-  padding: 7px 9px;
+  background: ${(p) => p.$bg};
+  border: 2px solid ${(p) => p.$border};
+  padding: 8px 10px;
   margin: 8px 0;
   font-size: 12px;
   line-height: 1.4;
-  color: #111;
-  b { display: block; margin-bottom: 3px; }
+  color: ${(p) => p.$color};
+  b { display: block; margin-bottom: 3px; color: ${(p) => p.$heading}; font-size: 13px; }
 `;
 const AdSpecs = styled.ul`
   margin: 6px 0 0;
@@ -344,7 +344,7 @@ const AdSpecs = styled.ul`
   font-size: 12px;
   line-height: 1.5;
   li { padding-left: 16px; position: relative; }
-  li:before { content: "\\2714"; position: absolute; left: 0; color: #0a8f2a; font-weight: 700; }
+  li:before { content: "\\2714"; position: absolute; left: 0; color: ${(p) => p.$bullet}; font-weight: 700; }
 `;
 const AdReq = styled.div`
   font-family: "Courier New", monospace !important;
@@ -411,89 +411,6 @@ const AdSeal = styled.div`
   ${(p) => (p.$side === "left" ? "left: 6px; transform: rotate(11deg);" : "right: 6px; transform: rotate(-12deg);")}
 `;
 
-/* shared widget shell */
-const AdWidget = styled.div`
-  border: 1px solid #000;
-  margin: 8px 0;
-  padding: 6px 8px;
-  font-size: 11px;
-  background: ${(p) => p.$bg};
-  color: ${(p) => p.$fg};
-  border-color: ${(p) => p.$border || "#000"};
-  .wlabel { font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
-`;
-
-/* Sapling: a small static "live knowledge graph" — round = concepts, square = docs. */
-function KnowledgeGraph() {
-  const nodeStyle = (l, t, doc) => ({
-    position: "absolute",
-    left: l,
-    top: t,
-    width: doc ? 15 : 11,
-    height: doc ? 15 : 11,
-    borderRadius: doc ? 2 : "50%",
-    background: doc ? "#ffd83d" : "#7CFC9A",
-    boxShadow: `0 0 6px ${doc ? "#ffd83d" : "#7CFC9A"}`,
-  });
-  return (
-    <AdWidget $bg="#0c3d1c" $fg="#bdf5c8" $border="#16a34a">
-      <div className="wlabel">▶ live knowledge graph — building…</div>
-      <div style={{ position: "relative", height: 64 }}>
-        <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
-          {[
-            [20, 14, 64, 40], [64, 40, 130, 18], [64, 40, 120, 56],
-            [20, 14, 170, 30], [120, 56, 180, 50],
-          ].map(([x1, y1, x2, y2], i) => (
-            <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#3fb950" strokeWidth="1.5" opacity="0.7" />
-          ))}
-        </svg>
-        <span style={nodeStyle(12, 8, true)} />
-        <span style={nodeStyle(60, 35, false)} />
-        <span style={nodeStyle(126, 13, false)} />
-        <span style={nodeStyle(116, 51, false)} />
-        <span style={nodeStyle(172, 25, true)} />
-      </div>
-    </AdWidget>
-  );
-}
-
-/* Mario: AI-relationship heart meter + spinning levels-generated counter. */
-function RelationshipMeter() {
-  return (
-    <AdWidget $bg="#1a1230" $fg="#ffd83d" $border="#000">
-      <div className="wlabel">🤖 your A.I. buddy likes how you play</div>
-      <span style={{ color: "#ff4d6d", letterSpacing: 2, fontSize: 14 }}>❤ ❤ ❤ ❤ ♡</span>
-      &nbsp;·&nbsp;
-      <span style={{
-        fontFamily: '"Courier New", monospace', fontWeight: 900, fontSize: 13,
-        color: "#fff", background: "#000", padding: "2px 5px",
-      }}>
-        LEVELS GENERATED: 9,999,999
-      </span>
-    </AdWidget>
-  );
-}
-
-/* Stalk: rising portfolio chart + ML risk-engine gauge. */
-function RiskGauge() {
-  return (
-    <AdWidget $bg="#12041f" $fg="#fff" $border="#ffd83d"
-      style={{ display: "flex", gap: 8, alignItems: "center" }}>
-      <svg viewBox="0 0 88 46" preserveAspectRatio="none"
-        style={{ flex: "0 0 88px", height: 46, background: "#000", border: "1px solid #2a0a45" }}>
-        <polyline points="2,42 18,36 34,38 50,22 66,26 86,4" fill="none" stroke="#7CFC9A" strokeWidth="2" />
-      </svg>
-      <div style={{ flex: 1 }}>
-        <div className="wlabel">🧠 ML risk engine</div>
-        <div>RISK: LOW</div>
-        <div style={{ height: 9, background: "#2a0a45", border: "1px solid #000", marginTop: 3 }}>
-          <div style={{ height: "100%", width: "25%", background: "linear-gradient(90deg,#7CFC9A,#ffd83d)" }} />
-        </div>
-      </div>
-    </AdWidget>
-  );
-}
-
 /* ---- Taskbar ----
    React95 AppBar/Toolbar + md Buttons default to ~44px tall (button height 36px,
    Toolbar padding 4px). The original taskbar is 32px: 25px controls + 3px padding.
@@ -555,9 +472,9 @@ const APPS = {
   about: { title: "About Me", icon: "/msagent.png", width: 700, height: 400, pixel: true },
   projects: { title: "Projects", icon: "/projects.png", width: 420, height: 220, pixel: true },
   bank: { title: "RUNDLL", icon: "/money.png", width: 420, sound: true },
-  sapling: { title: "Sapling", icon: "/projects.png", width: 330, height: 700, pixel: true },
-  mario: { title: "Super Artificial Bros.", icon: "/projects.png", width: 330, height: 700, pixel: true },
-  stalk: { title: "Stalk Market", icon: "/projects.png", width: 330, height: 700, pixel: true },
+  sapling: { title: "Sapling", icon: "/projects.png", width: 330, height: 620, pixel: true },
+  mario: { title: "Super Artificial Bros.", icon: "/projects.png", width: 330, height: 620, pixel: true },
+  stalk: { title: "Stalk Market", icon: "/projects.png", width: 330, height: 620, pixel: true },
 };
 
 /* Project windows that spawn (at random on-screen spots) when Projects is opened. */
@@ -596,6 +513,11 @@ const PROJECTS = [
         hookFont: "Impact, Arial, sans-serif",
         sealBg: "#16a34a",
         cta: "linear-gradient(180deg,#42c75c,#1f7a33)",
+        infoBg: "linear-gradient(180deg,#f4fff6,#ddf6e2)",
+        infoBorder: "#1f7a33",
+        infoColor: "#0f401f",
+        infoHeading: "#11772a",
+        infoBullet: "#0a8f2a",
       },
     },
   },
@@ -631,6 +553,11 @@ const PROJECTS = [
         hookFont: "'Comic Sans MS', Impact, Arial, sans-serif",
         sealBg: "#e34c26",
         cta: "linear-gradient(180deg,#ffcf3f,#e09a00)",
+        infoBg: "#241a3a",
+        infoBorder: "#ffd83d",
+        infoColor: "#ffffff",
+        infoHeading: "#ffd83d",
+        infoBullet: "#7CFC9A",
       },
     },
   },
@@ -666,6 +593,11 @@ const PROJECTS = [
         hookFont: "'Times New Roman', Georgia, serif",
         sealBg: "#ffce1f",
         cta: "linear-gradient(180deg,#bb6bff,#5a189a)",
+        infoBg: "linear-gradient(180deg,#241046,#12041f)",
+        infoBorder: "#ffd83d",
+        infoColor: "#ffffff",
+        infoHeading: "#ffd83d",
+        infoBullet: "#7CFC9A",
       },
     },
   },
@@ -915,9 +847,6 @@ function AboutBody() {
 function ProjectAd({ project: p }) {
   const ad = p.ad;
   const t = ad.theme;
-  const Widget =
-    ad.genre === "sapling" ? KnowledgeGraph :
-    ad.genre === "mario" ? RelationshipMeter : RiskGauge;
 
   return (
     <AdRoot $body={t.body}>
@@ -954,12 +883,10 @@ function ProjectAd({ project: p }) {
           <img src={p.img} alt={p.name} />
         </AdShot>
 
-        <Widget />
-
-        <AdInfo style={ad.genre === "stalk" ? { background: "#1c0530", borderColor: "#ffd83d", color: "#fff" } : undefined}>
-          <b style={ad.genre === "stalk" ? { color: "#ffd83d" } : undefined}>{p.name}</b>
+        <AdInfo $bg={t.infoBg} $border={t.infoBorder} $color={t.infoColor} $heading={t.infoHeading}>
+          <b>{p.name}</b>
           {p.desc}
-          <AdSpecs>
+          <AdSpecs $bullet={t.infoBullet}>
             {ad.bullets.map((b) => <li key={b}>{b}</li>)}
           </AdSpecs>
           <AdReq>BUILT WITH: ▶ {p.lang}</AdReq>
