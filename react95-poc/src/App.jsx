@@ -309,7 +309,7 @@ const AdShot = styled.div`
   border: 2px solid;
   border-color: #808080 #fff #fff #808080;
   background: #000;
-  img { display: block; width: 100%; height: 132px; object-fit: cover; }
+  img { display: block; width: 100%; height: auto; }
 `;
 const AdHud = styled.div`
   position: absolute;
@@ -387,38 +387,29 @@ const AdLegal = styled.div`
   line-height: 1.3;
 `;
 
-const AdStatus = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 2px 6px;
-  font-size: 11px;
-  color: #000;
-  border-top: 1px solid #808080;
-  background: #c0c0c0;
-  flex-shrink: 0;
-  .net { margin-left: auto; }
-`;
-
+/* Slapped in the bottom-right corner of the product shot (over the image, never
+   over text). Sized with generous padding so the seal text stays inside the
+   star's safe zone and never clips. */
 const AdSeal = styled.div`
   position: absolute;
-  width: 74px;
-  height: 74px;
+  right: 6px;
+  bottom: 6px;
+  width: 90px;
+  height: 90px;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-size: 12px;
+  font-size: 10.5px;
   font-weight: 900;
-  line-height: 0.95;
-  padding: 6px;
+  line-height: 1.05;
+  padding: 14px;
   z-index: 3;
   clip-path: polygon(50% 0,61% 18%,82% 12%,77% 33%,98% 38%,82% 53%,97% 70%,75% 70%,77% 92%,57% 80%,50% 100%,43% 80%,23% 92%,25% 70%,3% 70%,18% 53%,2% 38%,23% 33%,18% 12%,39% 18%);
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
   background: ${(p) => p.$bg};
   color: ${(p) => p.$fg || "#fff"};
-  top: ${(p) => p.$top || "34px"};
-  ${(p) => (p.$side === "left" ? "left: 6px; transform: rotate(11deg);" : "right: 6px; transform: rotate(-12deg);")}
+  transform: rotate(${(p) => p.$rot || "-10deg"});
 `;
 
 /* ---- Taskbar ----
@@ -482,9 +473,9 @@ const APPS = {
   about: { title: "About Me", icon: "/msagent.png", width: 700, height: 400, pixel: true },
   projects: { title: "Projects", icon: "/projects.png", width: 420, height: 220, pixel: true },
   bank: { title: "RUNDLL", icon: "/money.png", width: 420, sound: true },
-  sapling: { title: "Sapling", icon: "/projects.png", width: 330, height: 650, pixel: true },
-  mario: { title: "Super Artificial Bros.", icon: "/projects.png", width: 330, height: 650, pixel: true },
-  stalk: { title: "Stalk Market", icon: "/projects.png", width: 330, height: 650, pixel: true },
+  sapling: { title: "Sapling", icon: "/projects.png", width: 330, height: 690, pixel: true },
+  mario: { title: "Super Artificial Bros.", icon: "/projects.png", width: 330, height: 690, pixel: true },
+  stalk: { title: "Stalk Market", icon: "/projects.png", width: 330, height: 690, pixel: true },
 };
 
 /* Project windows that spawn (at random on-screen spots) when Projects is opened. */
@@ -562,11 +553,11 @@ const PROJECTS = [
         hookFont: "'Comic Sans MS', Impact, Arial, sans-serif",
         sealBg: "#e34c26",
         cta: "linear-gradient(180deg,#ffcf3f,#e09a00)",
-        infoBg: "#241a3a",
-        infoBorder: "#ffd83d",
-        infoColor: "#ffffff",
-        infoHeading: "#ffd83d",
-        infoBullet: "#7CFC9A",
+        infoBg: "linear-gradient(180deg,#fff7e6,#ffe1a6)",
+        infoBorder: "#b5231a",
+        infoColor: "#5a2600",
+        infoHeading: "#c62828",
+        infoBullet: "#2e9e3f",
         infoFont: "'Trebuchet MS', Verdana, Geneva, sans-serif",
       },
     },
@@ -871,15 +862,6 @@ function ProjectAd({ project: p }) {
       )}
 
       <AdScroll>
-        <AdSeal
-          $bg={t.sealBg}
-          $fg={ad.genre === "stalk" ? "#5a189a" : "#fff"}
-          $side={ad.genre === "mario" ? "left" : "right"}
-          $top={ad.genre === "stalk" ? "54px" : "34px"}
-        >
-          {ad.sealText}
-        </AdSeal>
-
         <AdHook $color={t.hookColor} $font={t.hookFont}>{ad.hook}</AdHook>
         {ad.sub && <AdSub style={{ color: ad.genre === "stalk" ? "#7CFC9A" : t.hookColor }}>{ad.sub}</AdSub>}
 
@@ -891,6 +873,13 @@ function ProjectAd({ project: p }) {
             <AdHud><span>PORTFOLIO ▲ +999%</span><span>$5,000</span></AdHud>
           )}
           <img src={p.img} alt={p.name} />
+          <AdSeal
+            $bg={t.sealBg}
+            $fg={ad.genre === "stalk" ? "#5a189a" : "#fff"}
+            $rot={ad.genre === "mario" ? "8deg" : "-10deg"}
+          >
+            {ad.sealText}
+          </AdSeal>
         </AdShot>
 
         <AdInfo
@@ -917,10 +906,6 @@ function ProjectAd({ project: p }) {
 
         <AdLegal>{ad.legal}</AdLegal>
       </AdScroll>
-
-      <AdStatus>
-        <span className="net">🌐 Internet</span>
-      </AdStatus>
     </AdRoot>
   );
 }
