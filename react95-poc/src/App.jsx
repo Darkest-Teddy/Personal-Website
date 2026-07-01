@@ -217,7 +217,6 @@ const FolderIcon = styled.div`
    90s-ad styled-components (project pop-up bodies)
    Fonts use !important to override the global W95FA rule.
 ================================================================== */
-const blink = keyframes`50% { opacity: 0; }`;
 const marquee = keyframes`from { transform: translateX(100%); } to { transform: translateX(-100%); }`;
 
 /* Wrapper: owns the per-project body background + base ad font. */
@@ -330,20 +329,33 @@ const AdHud = styled.div`
 const AdInfo = styled.div`
   background: ${(p) => p.$bg};
   border: 2px solid ${(p) => p.$border};
-  padding: 8px 10px;
+  padding: 9px 11px 10px;
   margin: 8px 0;
-  font-size: 12px;
-  line-height: 1.4;
+  font-family: ${(p) => p.$font} !important;
+  font-size: 12.5px;
+  line-height: 1.5;
   color: ${(p) => p.$color};
-  b { display: block; margin-bottom: 3px; color: ${(p) => p.$heading}; font-size: 13px; }
+  b {
+    display: block;
+    margin-bottom: 4px;
+    color: ${(p) => p.$heading};
+    font-family: ${(p) => p.$headingFont} !important;
+    font-size: 17px;
+    letter-spacing: 0.01em;
+  }
 `;
 const AdSpecs = styled.ul`
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   padding: 0;
   list-style: none;
+  font-family: ${(p) => p.$font} !important;
   font-size: 12px;
-  line-height: 1.5;
-  li { padding-left: 16px; position: relative; }
+  line-height: 1.6;
+  li {
+    padding-left: 17px;
+    position: relative;
+    font-family: ${(p) => p.$font} !important;
+  }
   li:before { content: "\\2714"; position: absolute; left: 0; color: ${(p) => p.$bullet}; font-weight: 700; }
 `;
 const AdReq = styled.div`
@@ -386,8 +398,6 @@ const AdStatus = styled.div`
   background: #c0c0c0;
   flex-shrink: 0;
   .net { margin-left: auto; }
-  .bk { animation: ${blink} 1s steps(1) infinite; }
-  @media (prefers-reduced-motion: reduce) { .bk { animation: none; } }
 `;
 
 const AdSeal = styled.div`
@@ -472,9 +482,9 @@ const APPS = {
   about: { title: "About Me", icon: "/msagent.png", width: 700, height: 400, pixel: true },
   projects: { title: "Projects", icon: "/projects.png", width: 420, height: 220, pixel: true },
   bank: { title: "RUNDLL", icon: "/money.png", width: 420, sound: true },
-  sapling: { title: "Sapling", icon: "/projects.png", width: 330, height: 620, pixel: true },
-  mario: { title: "Super Artificial Bros.", icon: "/projects.png", width: 330, height: 620, pixel: true },
-  stalk: { title: "Stalk Market", icon: "/projects.png", width: 330, height: 620, pixel: true },
+  sapling: { title: "Sapling", icon: "/projects.png", width: 330, height: 650, pixel: true },
+  mario: { title: "Super Artificial Bros.", icon: "/projects.png", width: 330, height: 650, pixel: true },
+  stalk: { title: "Stalk Market", icon: "/projects.png", width: 330, height: 650, pixel: true },
 };
 
 /* Project windows that spawn (at random on-screen spots) when Projects is opened. */
@@ -504,7 +514,6 @@ const PROJECTS = [
       sealText: "GROWS WITH YOU!",
       ctaLabel: "🌱 CLICK to PLANT your knowledge! »",
       ctaSub: "free & open-source · grows in real time",
-      statusText: "Graphing your brain…",
       legal: "*Side effects may include understanding. Sapling is a real project.",
       theme: {
         header: "linear-gradient(90deg,#1f7a33,#3fb950)",
@@ -518,6 +527,7 @@ const PROJECTS = [
         infoColor: "#0f401f",
         infoHeading: "#11772a",
         infoBullet: "#0a8f2a",
+        infoFont: "Georgia, 'Times New Roman', serif",
       },
     },
   },
@@ -544,7 +554,6 @@ const PROJECTS = [
       sealText: "GEMINI POWERED!",
       ctaLabel: "▶ PRESS START — PLAY NOW! »",
       ctaSub: "no download · the levels make themselves",
-      statusText: "● GENERATING LEVEL…",
       legal: "*Real open-source project. Mushrooms not included. AI may grow attached.",
       theme: {
         header: "linear-gradient(90deg,#b5231a,#e34c26)",
@@ -558,6 +567,7 @@ const PROJECTS = [
         infoColor: "#ffffff",
         infoHeading: "#ffd83d",
         infoBullet: "#7CFC9A",
+        infoFont: "'Trebuchet MS', Verdana, Geneva, sans-serif",
       },
     },
   },
@@ -584,7 +594,6 @@ const PROJECTS = [
       sealText: "RISK-FREE!*",
       ctaLabel: "💵 CLICK to PLAY the MARKET! »",
       ctaSub: "limited time · 100% simulated · no broker needed",
-      statusText: "$ MARKET OPEN…",
       legal: "*Not financial advice. Returns simulated. Real open-source learning game.",
       theme: {
         header: "linear-gradient(90deg,#5a189a,#9d4edd)",
@@ -598,6 +607,7 @@ const PROJECTS = [
         infoColor: "#ffffff",
         infoHeading: "#ffd83d",
         infoBullet: "#7CFC9A",
+        infoFont: "Georgia, 'Times New Roman', serif",
       },
     },
   },
@@ -883,10 +893,17 @@ function ProjectAd({ project: p }) {
           <img src={p.img} alt={p.name} />
         </AdShot>
 
-        <AdInfo $bg={t.infoBg} $border={t.infoBorder} $color={t.infoColor} $heading={t.infoHeading}>
+        <AdInfo
+          $bg={t.infoBg}
+          $border={t.infoBorder}
+          $color={t.infoColor}
+          $heading={t.infoHeading}
+          $font={t.infoFont}
+          $headingFont={t.hookFont}
+        >
           <b>{p.name}</b>
           {p.desc}
-          <AdSpecs $bullet={t.infoBullet}>
+          <AdSpecs $bullet={t.infoBullet} $font={t.infoFont}>
             {ad.bullets.map((b) => <li key={b}>{b}</li>)}
           </AdSpecs>
           <AdReq>BUILT WITH: ▶ {p.lang}</AdReq>
@@ -902,7 +919,6 @@ function ProjectAd({ project: p }) {
       </AdScroll>
 
       <AdStatus>
-        <span className="bk">{ad.statusText}</span>
         <span className="net">🌐 Internet</span>
       </AdStatus>
     </AdRoot>
