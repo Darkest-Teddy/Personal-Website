@@ -435,6 +435,11 @@ function WelcomeBody() {
       <h1 style={{ margin: "6px 0", fontSize: 34, fontWeight: "bold", lineHeight: 1 }}>'95 OS</h1>
       <p style={{ margin: "0 0 8px" }}>Seems like yesterday...<br />Developed by Jack He</p>
       <a href="https://github.com/Darkest-Teddy" target="_blank" rel="noreferrer">Github</a>
+      <div style={{ display: "flex", justifyContent: "center", gap: 4, marginTop: 12 }}>
+        <img src="/bestviewed.gif" alt="" style={{ imageRendering: "pixelated" }} />
+        <img src="/noframes3.gif" alt="" style={{ imageRendering: "pixelated" }} />
+        <img src="/notepadpowered.gif" alt="" style={{ imageRendering: "pixelated" }} />
+      </div>
     </div>
   );
 }
