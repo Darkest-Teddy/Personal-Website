@@ -59,6 +59,8 @@ const GlobalStyles = createGlobalStyle`
   ::-webkit-scrollbar { width: 17px; height: 17px; }
   ::-webkit-scrollbar-button { width: 17px; height: 17px; }
   ::-webkit-scrollbar-track { background: #808080; background-image: none; }
+  @keyframes win95-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+  .win95-blink { animation: win95-blink 1s step-end infinite; }
 `;
 
 const Wallpaper = styled.video`
@@ -268,6 +270,10 @@ function StalkIcon() {
   );
 }
 
+function BookIcon() {
+  return <img src="/book-icon.png" alt="" />;
+}
+
 /* ── App registry ── */
 const APPS = {
   welcome:  { title: "Welcome",    icon: "/welcome.png", width: 300, pixel: true },
@@ -277,7 +283,7 @@ const APPS = {
   github:   { title: "GitHub",     icon: "/icon-github.png",   link: "https://github.com/Darkest-Teddy",           pixel: true, bottom: true },
   linkedin: { title: "LinkedIn",   icon: "/linkedin.png", link: "https://www.linkedin.com/in/jacklhe/",       pixel: true, bottom: true },
   bank:     { title: "RUNDLL",     icon: "/money.png",    width: 420, sound: true },
-  updatelog: { title: "Patch", icon: "/projects.png", width: 300, height: 380, noDesktop: true },
+  updatelog: { title: "UpdateLog", iconNode: <BookIcon />, icon: "/projects.png", width: 320, height: 460, noDesktop: true },
   sapling: {
     title: "Sapling", iconNode: <SaplingIcon />, icon: "/sapling-icon.svg", width: 256,
     titlebarBg: "linear-gradient(180deg,#39a552,#1f7a33)", titlebarColor: "#fff",
@@ -303,7 +309,7 @@ const PROJECTS = [
 const TASKBAR_H = 32;
 const MIN_W = 200;
 const MIN_H = 120;
-const BODY_PAD = { welcome: 12, about: 0, projects: 0, bank: 0, resume: 0, sapling: 0, mario: 0, stalk: 0 };
+const BODY_PAD = { welcome: 12, about: 0, projects: 0, bank: 0, resume: 0, updatelog: 0, sapling: 0, mario: 0, stalk: 0 };
 
 function randomPosition(width, height) {
   const maxX = Math.max(8, window.innerWidth  - width  - 8);
@@ -542,7 +548,7 @@ function AboutBody() {
                   <div style={{ flex:1, minWidth:0, fontSize:15, lineHeight:1.7, color:"#000" }}>
                     <p style={{ margin:"0 0 14px" }}>Hi, I'm <b>Jack He</b>, a Computer Science student at <b>Boston University</b> (minor in Data Science, GPA 3.93, Class of 2029). I build software with a real purpose and a little personality.</p>
                     <p style={{ margin:"0 0 14px" }}>I'm especially into <b>machine learning</b>, and I've spent a good chunk of time training custom AI models from scratch using online data and reinforced prompting.</p>
-                    <p style={{ margin:0 }}>I've racked up <b>4 hackathon wins</b> so far, which shows I can adapt and think critically in a team environment fast (fueled by a healthy supply of Red Bulls). Beyond that, I aim to not just ship code every day but to understand it to the fullest, so we can build toward a safer but promising future.</p>
+                    <p style={{ margin:0 }}>I've racked up <b>4 hackathon wins</b> so far, which shows I can adapt and think critically in a team environment fast (fueled by a healthy supply of Red Bulls). Beyond that, I aim to not just ship code every day but to understand it to the fullest, so we can build toward a future where we aren't just giving our brains to the machines at its fullest.</p>
                   </div>
                 </div>
               </div>
@@ -608,9 +614,11 @@ function AboutBody() {
                 <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
                   {ABOUT_HACKS.map((h, i) => (
                     <div key={i} style={{ background:"#fff", boxShadow:raised, padding:"10px 12px", display:"flex", gap:12, alignItems:"flex-start" }}>
-                      <div style={{ width:112, height:64, flexShrink:0, padding:3, boxShadow:sunken, background:h.logoBg, overflow:"hidden" }}>
-                        <img src={h.logo} alt={h.name} style={{ width:"100%", height:"100%", objectFit:"contain" }}
-                          onError={e => { e.target.style.display="none"; }} />
+                      <div style={{ width:112, flexShrink:0 }}>
+                        <div style={{ width: h.name === "Super Artificial Bros." ? 86 : 112, height:64, padding:3, boxShadow:sunken, background:h.logoBg, overflow:"hidden" }}>
+                          <img src={h.logo} alt={h.name} style={{ width:"100%", height:"100%", objectFit:"contain" }}
+                            onError={e => { e.target.style.display="none"; }} />
+                        </div>
                       </div>
                       <div style={{ flex:1, minWidth:0 }}>
                         <div style={{ display:"flex", alignItems:"baseline", gap:8, marginBottom:4 }}>
@@ -885,26 +893,66 @@ function BankBody() {
 }
 
 const UPDATE_LOG = [
-  { name: "Launch", date: "2026-07-02", bullets: [
-    "Site is live at jacklhe.com",
-    "Added Resume window with PDF viewer",
-    "Added GitHub and LinkedIn desktop icons",
-    "Added Update Log window",
+  { name: "Site Launch", date: "7/2/26", bullets: [
+    "jacklhe.com is live",
+    "Win95-themed desktop with draggable windows",
+    "About Me, Projects, Resume, and Update Log windows",
+    "Retro wallpaper, sounds, and 88x31 web badges",
   ]},
 ];
 
-function UpdateLogBody() {
+function UpdateLogMenuBar() {
+  const [open, setOpen] = useState(null);
   return (
-    <div style={{ fontFamily: "'W95FA',Tahoma,sans-serif", fontSize: 12, background: "#fffde7", height: "100%", overflowY: "auto", padding: "8px 10px" }}>
-      <div style={{ fontWeight: "bold", fontSize: 14, marginBottom: 10 }}>📋 Patch Updates...</div>
-      {UPDATE_LOG.map((entry, i) => (
-        <div key={i} style={{ marginBottom: 12 }}>
-          <div style={{ fontWeight: "bold" }}>**{entry.name}** – {entry.date}</div>
-          {entry.bullets.map((b, j) => (
-            <div key={j} style={{ paddingLeft: 4 }}>- {b}</div>
-          ))}
+    <div style={{ display: "flex", background: "#c0c0c0", borderBottom: "1px solid #808080",
+      flexShrink: 0, userSelect: "none", color: "#000" }}>
+      {["File", "Edit", "Search", "Help"].map(item => (
+        <div key={item}
+          onMouseDown={() => setOpen(open === item ? null : item)}
+          onBlur={() => setOpen(null)}
+          tabIndex={0}
+          style={{ padding: "2px 8px", fontSize: 13, cursor: "default",
+            background: open === item ? "#000080" : "transparent",
+            color: open === item ? "#fff" : "#000" }}
+          onMouseEnter={() => { if (open) setOpen(item); }}
+        >
+          <span style={{ textDecoration: "underline" }}>{item[0]}</span>{item.slice(1)}
         </div>
       ))}
+    </div>
+  );
+}
+
+function UpdateLogBody() {
+  const sunken = "inset 1px 1px 0 #808080, inset -1px -1px 0 #fff, inset 2px 2px 0 #404040, inset -2px -2px 0 #dfdfdf";
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden", color: "#000" }}>
+      <UpdateLogMenuBar />
+      <div style={{
+        flex: 1, minHeight: 0, overflowY: "auto",
+        margin: "2px 3px 3px", boxShadow: sunken,
+        background: "#fffde7", padding: "8px 10px",
+        fontFamily: "'W95FA',Tahoma,sans-serif", fontSize: 15, color: "#000",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 10 }}>
+          <img src="/info-icon.png" alt="" style={{ width: 22, height: 22, imageRendering: "pixelated", flexShrink: 0 }} />
+          <span style={{ fontWeight: "bold", fontSize: 20, color: "#000" }}>New Updates...</span>
+        </div>
+        {UPDATE_LOG.map((entry, i) => {
+          const isLast = i === UPDATE_LOG.length - 1;
+          return (
+            <div key={i} style={{ marginBottom: 10 }}>
+              <div style={{ fontWeight: "bold", fontSize: 17, color: "#000" }}>{entry.name} - {entry.date}</div>
+              {entry.bullets.map((b, j) => {
+                const isLastBullet = isLast && j === entry.bullets.length - 1;
+                return (
+                  <div key={j} style={{ color: "#000" }}>- {b}{isLastBullet && <span className="win95-blink">█</span>}</div>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -928,7 +976,7 @@ export default function App() {
     const wy = Math.max(8, Math.round((window.innerHeight - TASKBAR_H - 300) / 2));
     return {
       welcome:   { open: true,  min: false, max: false, x: wx,      y: wy,      z: 10, prev: null },
-      updatelog: { open: true,  min: false, max: false, x: wx + 280, y: wy,      z: 9,  prev: null },
+      updatelog: { open: true,  min: false, max: false, x: Math.max(8, window.innerWidth - 330), y: 8, z: 9, prev: null },
       about:     { open: false, min: false, max: false, x: 140,      y: 70,      z: 1,  prev: null },
       projects:  { open: false, min: false, max: false, x: 200,      y: 90,      z: 1,  prev: null },
       bank:      { open: false, min: false, max: false, x: 320,      y: 160,     z: 1,  prev: null },
