@@ -277,7 +277,7 @@ const APPS = {
   github:   { title: "GitHub",     icon: "/icon-github.png",   link: "https://github.com/Darkest-Teddy",           pixel: true, bottom: true },
   linkedin: { title: "LinkedIn",   icon: "/linkedin.png", link: "https://www.linkedin.com/in/jacklhe/",       pixel: true, bottom: true },
   bank:     { title: "RUNDLL",     icon: "/money.png",    width: 420, sound: true },
-  updatelog: { title: "Update Log", icon: "/projects.png", width: 300, height: 360, noDesktop: true },
+  updatelog: { title: "Patch", icon: "/projects.png", width: 300, height: 380, noDesktop: true },
   sapling: {
     title: "Sapling", iconNode: <SaplingIcon />, icon: "/sapling-icon.svg", width: 256,
     titlebarBg: "linear-gradient(180deg,#39a552,#1f7a33)", titlebarColor: "#fff",
@@ -880,21 +880,24 @@ function BankBody() {
 }
 
 const UPDATE_LOG = [
-  { date: "2026-07-02", text: "Launched jacklhe.com — '95 OS goes live." },
-  { date: "2026-07-02", text: "Added Resume viewer with PDF.js." },
-  { date: "2026-07-02", text: "Added GitHub and LinkedIn desktop icons." },
+  { name: "Launch", date: "2026-07-02", bullets: [
+    "Site is live at jacklhe.com",
+    "Added Resume window with PDF viewer",
+    "Added GitHub and LinkedIn desktop icons",
+    "Added Update Log window",
+  ]},
 ];
 
 function UpdateLogBody() {
   return (
-    <div style={{ fontFamily: "'W95FA',Tahoma,sans-serif", fontSize: 12, padding: 8 }}>
-      <div style={{ borderBottom: "1px solid #808080", marginBottom: 8, paddingBottom: 4, fontWeight: "bold", fontSize: 13 }}>
-        What's New
-      </div>
+    <div style={{ fontFamily: "'W95FA',Tahoma,sans-serif", fontSize: 12, background: "#fffde7", height: "100%", overflowY: "auto", padding: "8px 10px" }}>
+      <div style={{ fontWeight: "bold", fontSize: 14, marginBottom: 10 }}>📋 Patch Updates...</div>
       {UPDATE_LOG.map((entry, i) => (
-        <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6, alignItems: "flex-start" }}>
-          <span style={{ color: "#808080", whiteSpace: "nowrap", flexShrink: 0 }}>{entry.date}</span>
-          <span>{entry.text}</span>
+        <div key={i} style={{ marginBottom: 12 }}>
+          <div style={{ fontWeight: "bold" }}>**{entry.name}** – {entry.date}</div>
+          {entry.bullets.map((b, j) => (
+            <div key={j} style={{ paddingLeft: 4 }}>- {b}</div>
+          ))}
         </div>
       ))}
     </div>
