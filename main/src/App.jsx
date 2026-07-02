@@ -911,11 +911,13 @@ export default function App() {
   const [time, setTime] = useState("");
   const zTop = useRef(10);
   const errorSound = useRef(null);
+  const audioCtxRef = useRef(null);
   const chordSound = useRef(null);
   const winsRef = useRef(null);
 
   useEffect(() => {
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    audioCtxRef.current = audioCtx;
     const gainNode = audioCtx.createGain();
     gainNode.gain.value = 3.0;
     gainNode.connect(audioCtx.destination);
@@ -967,8 +969,8 @@ export default function App() {
       return next;
     });
     if (APPS[id].sound && errorSound.current) {
-      errorSound.current.currentTime = 0;
-      errorSound.current.play().catch(() => {});
+      const play = () => { errorSound.current.currentTime = 0; errorSound.current.play().catch(() => {}); };
+      audioCtxRef.current?.resume().then(play).catch(play);
     }
     if (id === "projects" && chordSound.current) {
       const anyNew = PROJECT_IDS.some(pid => !winsRef.current[pid].open);
