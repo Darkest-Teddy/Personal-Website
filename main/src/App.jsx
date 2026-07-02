@@ -270,7 +270,7 @@ function StalkIcon() {
 
 /* ── App registry ── */
 const APPS = {
-  welcome:  { title: "Welcome",    icon: "/welcome.png", width: 256, pixel: true },
+  welcome:  { title: "Welcome",    icon: "/welcome.png", width: 300, pixel: true },
   about:    { title: "About Me", icon: "/msagent.png", width: 760, height: 480, pixel: true },
   projects: { title: "Projects",   icon: "/projects.png", width: 420, height: 220, pixel: true },
   resume:   { title: "Resume",     icon: "/resume.png",   width: 680, height: 860, pixel: true, gridRow: 3, gridColumn: 2 },
@@ -436,9 +436,9 @@ function WelcomeBody() {
       <p style={{ margin: "0 0 8px" }}>Seems like yesterday...<br />Developed by Jack He</p>
       <a href="https://github.com/Darkest-Teddy" target="_blank" rel="noreferrer">Github</a>
       <div style={{ display: "flex", justifyContent: "center", gap: 4, marginTop: 12 }}>
-        <img src="/bestviewed.gif" alt="" style={{ width: 74, height: "auto", imageRendering: "pixelated" }} />
-        <img src="/noframes3.gif" alt="" style={{ width: 74, height: "auto", imageRendering: "pixelated" }} />
-        <img src="/notepadpowered.gif" alt="" style={{ width: 74, height: "auto", imageRendering: "pixelated" }} />
+        <img src="/bestviewed.gif" alt="" style={{ imageRendering: "pixelated" }} />
+        <img src="/noframes3.gif" alt="" style={{ imageRendering: "pixelated" }} />
+        <img src="/notepadpowered.gif" alt="" style={{ imageRendering: "pixelated" }} />
       </div>
     </div>
   );
