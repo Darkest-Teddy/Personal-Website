@@ -277,6 +277,7 @@ const APPS = {
   github:   { title: "GitHub",     icon: "/icon-github.png",   link: "https://github.com/Darkest-Teddy",           pixel: true, bottom: true },
   linkedin: { title: "LinkedIn",   icon: "/linkedin.png", link: "https://www.linkedin.com/in/jacklhe/",       pixel: true, bottom: true },
   bank:     { title: "RUNDLL",     icon: "/money.png",    width: 420, sound: true },
+  updatelog: { title: "Update Log", icon: "/projects.png", width: 300, height: 360, noDesktop: true },
   sapling: {
     title: "Sapling", iconNode: <SaplingIcon />, icon: "/sapling-icon.svg", width: 256,
     titlebarBg: "linear-gradient(180deg,#39a552,#1f7a33)", titlebarColor: "#fff",
@@ -878,15 +879,38 @@ function BankBody() {
   );
 }
 
+const UPDATE_LOG = [
+  { date: "2026-07-02", text: "Launched jacklhe.com — '95 OS goes live." },
+  { date: "2026-07-02", text: "Added Resume viewer with PDF.js." },
+  { date: "2026-07-02", text: "Added GitHub and LinkedIn desktop icons." },
+];
+
+function UpdateLogBody() {
+  return (
+    <div style={{ fontFamily: "'W95FA',Tahoma,sans-serif", fontSize: 12, padding: 8 }}>
+      <div style={{ borderBottom: "1px solid #808080", marginBottom: 8, paddingBottom: 4, fontWeight: "bold", fontSize: 13 }}>
+        What's New
+      </div>
+      {UPDATE_LOG.map((entry, i) => (
+        <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6, alignItems: "flex-start" }}>
+          <span style={{ color: "#808080", whiteSpace: "nowrap", flexShrink: 0 }}>{entry.date}</span>
+          <span>{entry.text}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 const BODIES = {
-  welcome:  <WelcomeBody />,
-  about:    <AboutBody />,
-  projects: <ProjectsBody />,
-  bank:     <BankBody />,
-  resume:   <ResumeBody />,
-  sapling:  <SaplingAd />,
-  mario:    <MarioAd />,
-  stalk:    <StalkAd />,
+  welcome:   <WelcomeBody />,
+  about:     <AboutBody />,
+  projects:  <ProjectsBody />,
+  bank:      <BankBody />,
+  resume:    <ResumeBody />,
+  updatelog: <UpdateLogBody />,
+  sapling:   <SaplingAd />,
+  mario:     <MarioAd />,
+  stalk:     <StalkAd />,
 };
 
 /* ── App + window manager ── */
@@ -895,14 +919,15 @@ export default function App() {
     const wx = Math.max(8, Math.round((window.innerWidth - APPS.welcome.width) / 2));
     const wy = Math.max(8, Math.round((window.innerHeight - TASKBAR_H - 300) / 2));
     return {
-      welcome:  { open: true,  min: false, max: false, x: wx,  y: wy,  z: 10, prev: null },
-      about:    { open: false, min: false, max: false, x: 140, y: 70,  z: 1,  prev: null },
-      projects: { open: false, min: false, max: false, x: 200, y: 90,  z: 1,  prev: null },
-      bank:     { open: false, min: false, max: false, x: 320, y: 160, z: 1,  prev: null },
-      resume:   { open: false, min: false, max: false, x: 180, y: 60,  z: 1,  prev: null },
-      sapling:  { open: false, min: false, max: false, x: 0,   y: 0,   z: 1,  prev: null },
-      mario:    { open: false, min: false, max: false, x: 0,   y: 0,   z: 1,  prev: null },
-      stalk:    { open: false, min: false, max: false, x: 0,   y: 0,   z: 1,  prev: null },
+      welcome:   { open: true,  min: false, max: false, x: wx,      y: wy,      z: 10, prev: null },
+      updatelog: { open: true,  min: false, max: false, x: wx + 280, y: wy,      z: 9,  prev: null },
+      about:     { open: false, min: false, max: false, x: 140,      y: 70,      z: 1,  prev: null },
+      projects:  { open: false, min: false, max: false, x: 200,      y: 90,      z: 1,  prev: null },
+      bank:      { open: false, min: false, max: false, x: 320,      y: 160,     z: 1,  prev: null },
+      resume:    { open: false, min: false, max: false, x: 180,      y: 60,      z: 1,  prev: null },
+      sapling:   { open: false, min: false, max: false, x: 0,        y: 0,       z: 1,  prev: null },
+      mario:     { open: false, min: false, max: false, x: 0,        y: 0,       z: 1,  prev: null },
+      stalk:     { open: false, min: false, max: false, x: 0,        y: 0,       z: 1,  prev: null },
     };
   });
   const [activeId, setActiveId]   = useState("welcome");
@@ -1005,7 +1030,7 @@ export default function App() {
 
         <IconGrid onMouseDown={e => e.stopPropagation()}>
           {Object.entries(APPS)
-            .filter(([id, app]) => !PROJECT_IDS.includes(id) && !app.bottom)
+            .filter(([id, app]) => !PROJECT_IDS.includes(id) && !app.bottom && !app.noDesktop)
             .map(([id, app]) => (
               <DesktopIcon
                 key={id}
@@ -1071,7 +1096,7 @@ export default function App() {
 
             {/* Menu items */}
             <div style={{ display: "flex", flexDirection: "column", padding: 3, minWidth: 180 }}>
-              {Object.entries(APPS).filter(([id, app]) => !PROJECT_IDS.includes(id) && !app.bottom).map(([id, app]) => (
+              {Object.entries(APPS).filter(([id, app]) => !PROJECT_IDS.includes(id) && !app.bottom && !app.noDesktop).map(([id, app]) => (
                 <div key={id} onClick={() => app.link ? window.open(app.link, "_blank") : openWin(id)}
                   style={{ display: "flex", alignItems: "center", gap: 9, padding: "6px 10px",
                     fontSize: 14, cursor: "default", userSelect: "none", color: "#000" }}
