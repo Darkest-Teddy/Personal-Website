@@ -4,6 +4,5 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 RUN npm run build
-RUN npm install -g serve
 EXPOSE 3000
-CMD serve dist -s -p ${PORT:-3000}
+CMD npx vite preview --host 0.0.0.0 --port ${PORT:-3000}
