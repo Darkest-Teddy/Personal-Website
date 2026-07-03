@@ -286,6 +286,17 @@ const MINE_ICON_URI = "data:image/svg+xml," + encodeURIComponent(
   '</svg>'
 );
 
+function MsShockedFace() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 26 26" style={{ display: 'block', imageRendering: 'pixelated' }} shapeRendering="crispEdges">
+      <circle cx="13" cy="13" r="12" fill="#ffff00" stroke="#000" strokeWidth="1.5"/>
+      <rect x="7" y="9" width="4" height="4" fill="#000"/>
+      <rect x="15" y="9" width="4" height="4" fill="#000"/>
+      <ellipse cx="13" cy="19" rx="3" ry="3.5" fill="#000"/>
+    </svg>
+  );
+}
+
 const MS_LEVELS = {
   beginner:     { rows: 9,  cols: 9,  mines: 10 },
   intermediate: { rows: 16, cols: 16, mines: 40 },
@@ -1622,7 +1633,10 @@ function MinesweeperBody() {
               onMouseDown={e => { e.currentTarget.style.borderColor = '#808080 #fff #fff #808080'; }}
               onMouseUp={e => { e.currentTarget.style.borderColor = '#fff #808080 #808080 #fff'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = '#fff #808080 #808080 #fff'; }}>
-              <img src={smileyState === 'dead' ? '/assets/minesweeper/Minesweeper - Lost.png' : smileyState === 'cool' ? '/assets/minesweeper/Minesweeper - Won.png' : '/assets/minesweeper/Minesweeper - Idle.png'} alt="" style={{ width: 24, height: 24, imageRendering: 'pixelated' }} />
+              {smileyState === 'shocked'
+                ? <MsShockedFace />
+                : <img src={smileyState === 'dead' ? '/assets/minesweeper/Minesweeper - Lost.png' : smileyState === 'cool' ? '/assets/minesweeper/Minesweeper - Won.png' : '/assets/minesweeper/Minesweeper - Idle.png'} alt="" style={{ width: 24, height: 24, imageRendering: 'pixelated' }} />
+              }
             </button>
             <LcdPanel value={time} digits={3} />
           </div>
