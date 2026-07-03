@@ -1087,6 +1087,11 @@ function BankBody() {
 }
 
 const UPDATE_LOG = [
+  { name: "Photos, Mines, & Messages", date: "7/3/26", bullets: [
+    "Minesweeper is here baby",
+    "Added a photo gallery to showcase pictures of my events, lovely people, and more amazing stuff",
+    "You can send emails to me now!",
+  ]},
   { name: "Site Launch", date: "7/2/26", bullets: [
     "jacklhe.com is live",
     "Win95-themed desktop with draggable windows",
@@ -1133,7 +1138,7 @@ function UpdateLogBody() {
           <span style={{ fontWeight: "bold", fontSize: 20, color: "#000" }}>New Updates...</span>
         </div>
         {UPDATE_LOG.map((entry, i) => {
-          const isLast = i === UPDATE_LOG.length - 1;
+          const isLast = i === 0;
           return (
             <div key={i} style={{ marginBottom: 10 }}>
               <div style={{ fontWeight: "bold", fontSize: 17, color: "#000" }}>{entry.name} - {entry.date}</div>
@@ -1420,8 +1425,10 @@ function MinesweeperBody() {
   const [flagCount, setFlagCount] = useState(0);
   const [time, setTime] = useState(0);
   const [pressedCell, setPressedCell] = useState(null);
+  const [clickedMine, setClickedMine] = useState(null);
   const [menuOpen, setMenuOpen] = useState(null);
   const timerRef = useRef(null);
+  const playSound = (file) => { try { new Audio(`/assets/minesweeper/${file}`).play(); } catch {} };
 
   const { rows, cols, mines } = MS_LEVELS[level];
 
@@ -1433,7 +1440,9 @@ function MinesweeperBody() {
     setGameState('idle');
     setFlagCount(0);
     setTime(0);
+    setClickedMine(null);
     if (lv) setLevel(lv);
+    playSound('reset.ogg');
   }, [level]);
 
   useEffect(() => () => clearInterval(timerRef.current), []);
@@ -1471,13 +1480,16 @@ function MinesweeperBody() {
       if (hitMine) {
         g = g.map(row => row.map(c => c.mine && c.state !== 'flagged' ? { ...c, state: 'revealed' } : { ...c }));
         clearInterval(timerRef.current);
+        playSound('bomb.ogg');
         setCells(g); setGameState('lost'); return;
       }
       if (msCheckWon(g, rows, cols)) {
         clearInterval(timerRef.current);
         setCells(g.map(row => row.map(c => c.mine ? { ...c, state: 'flagged' } : { ...c })));
+        playSound('win.ogg');
         setFlagCount(mines); setGameState('won'); return;
       }
+      playSound('click.ogg');
       setCells(g); return;
     }
 
@@ -1491,14 +1503,18 @@ function MinesweeperBody() {
     if (g[r][c].mine) {
       g = g.map(row => row.map(c => c.mine && c.state !== 'flagged' ? { ...c, state: 'revealed' } : { ...c }));
       clearInterval(timerRef.current);
+      playSound('bomb.ogg');
+      setClickedMine({ r, c });
       setCells(g); setGameState('lost'); return;
     }
     g = msReveal(g, r, c, rows, cols);
     if (msCheckWon(g, rows, cols)) {
       clearInterval(timerRef.current);
       setCells(g.map(row => row.map(c => c.mine ? { ...c, state: 'flagged' } : { ...c })));
+      playSound('win.ogg');
       setFlagCount(mines); setGameState('won'); return;
     }
+    playSound('click.ogg');
     setCells(g);
   };
 
@@ -1508,8 +1524,8 @@ function MinesweeperBody() {
     if (cells[r][c].state === 'revealed') return;
     const g = cells.map(row => row.map(c => ({ ...c })));
     const cur = g[r][c].state;
-    if (cur === 'hidden') { g[r][c].state = 'flagged'; setFlagCount(f => f + 1); }
-    else if (cur === 'flagged') { g[r][c].state = 'question'; setFlagCount(f => f - 1); }
+    if (cur === 'hidden') { g[r][c].state = 'flagged'; setFlagCount(f => f + 1); playSound('flag_sound.ogg'); }
+    else if (cur === 'flagged') { g[r][c].state = 'question'; setFlagCount(f => f - 1); playSound('unflag.ogg'); }
     else { g[r][c].state = 'hidden'; }
     setCells(g);
   };
@@ -1523,8 +1539,9 @@ function MinesweeperBody() {
     const base = { width: CELL, height: CELL, boxSizing: 'border-box', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' };
 
     if (state === 'revealed') {
+      const isClickedMine = mine && clickedMine && clickedMine.r === r && clickedMine.c === c;
       return (
-        <div key={key} style={{ ...base, border: '1px solid #808080', background: mine ? '#f00' : '#c0c0c0', fontSize: 13, fontWeight: 'bold', color: MS_NUM_COLOR[adj] || '#000', fontFamily: "'W95FA', sans-serif", userSelect: 'none' }}
+        <div key={key} style={{ ...base, border: '1px solid #808080', background: isClickedMine ? '#f00' : '#c0c0c0', fontSize: 13, fontWeight: 'bold', color: MS_NUM_COLOR[adj] || '#000', fontFamily: "'W95FA', sans-serif", userSelect: 'none' }}
           onClick={() => handleClick(r, c)}>
           {mine ? <MsMine size={12} /> : adj > 0 ? adj : null}
         </div>
@@ -1540,7 +1557,10 @@ function MinesweeperBody() {
           {wrongFlag
             ? <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <MsMine size={12} />
-                <div style={{ position: 'absolute', fontSize: 13, color: '#f00', fontWeight: 'bold', pointerEvents: 'none' }}>✕</div>
+                <svg width="12" height="12" viewBox="0 0 12 12" style={{ position: 'absolute', pointerEvents: 'none' }} shapeRendering="crispEdges">
+                  <line x1="1" y1="1" x2="11" y2="11" stroke="#f00" strokeWidth="2.5" strokeLinecap="round"/>
+                  <line x1="11" y1="1" x2="1" y2="11" stroke="#f00" strokeWidth="2.5" strokeLinecap="round"/>
+                </svg>
               </div>
             : <MsFlag size={12} />}
         </div>
