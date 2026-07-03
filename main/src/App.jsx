@@ -1736,7 +1736,7 @@ function EmailBody() {
           <input readOnly value="jackhe@bu.edu" style={{ ...inputStyle, background: '#c0c0c0', userSelect: 'none', flex: 1 }} />
           <div style={{ marginLeft: 6, flexShrink: 0 }}>
             <W95Btn onClick={handleSend} disabled={status === 'sending'}>
-              <img src="/assets/email/icon-email.png" alt="" style={{ width: 16, height: 16, objectFit: 'contain', display: 'block', imageRendering: 'pixelated' }} />
+              <img src="/assets/email/send.svg" alt="" style={{ width: 16, height: 16, objectFit: 'contain', display: 'block' }} />
               Send
             </W95Btn>
           </div>
