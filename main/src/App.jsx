@@ -288,11 +288,14 @@ const MINE_ICON_URI = "data:image/svg+xml," + encodeURIComponent(
 
 function MsShockedFace() {
   return (
-    <svg width="24" height="24" viewBox="0 0 26 26" style={{ display: 'block', imageRendering: 'pixelated' }} shapeRendering="crispEdges">
-      <circle cx="13" cy="13" r="12" fill="#ffff00" stroke="#000" strokeWidth="1.5"/>
-      <rect x="7" y="9" width="4" height="4" fill="#000"/>
-      <rect x="15" y="9" width="4" height="4" fill="#000"/>
-      <ellipse cx="13" cy="19" rx="3" ry="3.5" fill="#000"/>
+    <svg width="24" height="24" viewBox="0 0 100 100"
+         style={{ display: 'block', imageRendering: 'pixelated' }}
+         shapeRendering="crispEdges">
+      <circle cx="50" cy="50" r="49" fill="#000"/>
+      <circle cx="50" cy="50" r="43" fill="#ffff00"/>
+      <rect x="21" y="28" width="18" height="18" fill="#000"/>
+      <rect x="61" y="28" width="18" height="18" fill="#000"/>
+      <circle cx="50" cy="70" r="13" fill="#000"/>
     </svg>
   );
 }
