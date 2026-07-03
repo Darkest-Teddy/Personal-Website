@@ -513,8 +513,14 @@ function AboutBody() {
     <div style={{ display:"flex", flexDirection:"column", height:"100%", overflow:"hidden" }}>
 
       {/* Menu bar */}
-      <div style={{ height:20, flexShrink:0, display:"flex", alignItems:"center", gap:12, padding:"2px 6px 0", fontSize:13, cursor:"default", userSelect:"none" }}>
-        {["File","Edit","View","Help"].map(m => <span key={m}><u>{m[0]}</u>{m.slice(1)}</span>)}
+      <div style={{ height:20, flexShrink:0, display:"flex", alignItems:"center", padding:"2px 2px 0", fontSize:13, cursor:"default", userSelect:"none" }}>
+        {["File","Edit","View","Help"].map(m => (
+          <span key={m} style={{ padding:"1px 7px" }}
+            onMouseEnter={e=>{ e.currentTarget.style.background="#000080"; e.currentTarget.style.color="#fff"; }}
+            onMouseLeave={e=>{ e.currentTarget.style.background="transparent"; e.currentTarget.style.color="#000"; }}>
+            <span style={{textDecoration:"underline"}}>{m[0]}</span>{m.slice(1)}
+          </span>
+        ))}
       </div>
 
       {/* Two-panel body */}
@@ -615,7 +621,7 @@ function AboutBody() {
                 <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
                   {ABOUT_HACKS.map((h, i) => (
                     <div key={i} style={{ background:"#fff", boxShadow:raised, padding:"10px 12px", display:"flex", gap:12, alignItems:"flex-start" }}>
-                      <div style={{ width:112, flexShrink:0 }}>
+                      <div style={{ width:112, flexShrink:0, display:"flex", justifyContent:"center" }}>
                         <div style={{ width: h.name === "Super Artificial Bros." ? 86 : 112, height:64, padding:3, boxShadow:sunken, background:h.logoBg, overflow:"hidden" }}>
                           <img src={h.logo} alt={h.name} style={{ width:"100%", height:"100%", objectFit:"contain" }}
                             onError={e => { e.target.style.display="none"; }} />
@@ -1201,8 +1207,8 @@ function GalleryBody() {
 
           {/* Viewer */}
           {isViewer && cur && (
-            <div style={{ height:'100%', overflow:'auto', background:'#808080', boxShadow:'inset 1px 1px 0 #404040,inset -1px -1px 0 #fff', display:'flex', alignItems:'center', justifyContent:'center', padding:12 }}>
-              <img src={cur.src} alt="" style={{ display:'block', border:'5px solid #fff', boxShadow:'3px 3px 10px rgba(0,0,0,.55)', maxWidth:'calc(100% - 24px)', maxHeight:'calc(100% - 24px)', objectFit:'contain', transform:`scale(${st.zoom}) rotate(${st.rot}deg)`, transition:'transform 0.08s ease' }} onError={e=>{ e.target.alt='Image not found'; }}/>
+            <div style={{ height:'100%', overflow:'hidden', background:'#808080', boxShadow:'inset 1px 1px 0 #404040,inset -1px -1px 0 #fff', display:'flex', alignItems:'center', justifyContent:'center', padding:12 }}>
+              <img src={cur.src} alt="" style={{ display:'block', width:'calc(100% - 24px)', height:'calc(100% - 24px)', objectFit:'cover', border:'5px solid #fff', boxShadow:'3px 3px 10px rgba(0,0,0,.55)', transform:`scale(${st.zoom}) rotate(${st.rot}deg)`, transition:'transform 0.08s ease' }} onError={e=>{ e.target.alt='Image not found'; }}/>
             </div>
           )}
 
