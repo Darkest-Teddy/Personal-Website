@@ -45,7 +45,7 @@ const tickAnim = keyframes`
 
 const GlobalStyles = createGlobalStyle`
   ${styleReset}
-  @font-face { font-family: 'W95FA'; src: url('/W95FA.otf'); }
+  @font-face { font-family: 'W95FA'; src: url('/assets/shared/W95FA.otf'); }
   html, body, #root { height: 100%; margin: 0; }
   body, button, input, select, textarea, ul, li, h1, h2, h3, p, a {
     font-family: 'W95FA' !important;
@@ -271,7 +271,7 @@ function StalkIcon() {
 }
 
 function BookIcon() {
-  return <img src="/book-icon.png" alt="" />;
+  return <img src="/assets/updatelog/book-icon.png" alt="" />;
 }
 
 /* ── Minesweeper helpers + sprites ── */
@@ -444,7 +444,7 @@ function LcdPanel({ value, digits = 3 }) {
   );
 }
 
-function MineIconNode() { return <img src="/Minesweeper - 16.png" alt="" style={{ imageRendering: 'pixelated', width: 12, height: 12 }} />; }
+function MineIconNode() { return <img src="/assets/minesweeper/Minesweeper - 16.png" alt="" style={{ imageRendering: 'pixelated', width: 12, height: 12 }} />; }
 
 function EmailIconNode() {
   return (
@@ -461,27 +461,27 @@ const WEB3FORMS_KEY = 'e575da3e-474f-4a44-bbee-0dcf9e7b27d1';
 
 /* ── App registry ── */
 const APPS = {
-  welcome:  { title: "Welcome",    icon: "/welcome.png", width: 300, pixel: true },
-  about:    { title: "About Me", icon: "/msagent.png", width: 760, height: 480, pixel: true },
-  projects: { title: "Projects",   icon: "/projects.png", width: 420, height: 220, pixel: true },
-  resume:   { title: "Resume",     icon: "/resume.png",   width: 680, height: 860, pixel: true, gridRow: 3, gridColumn: 2 },
-  github:   { title: "GitHub",     icon: "/icon-github.png",   link: "https://github.com/Darkest-Teddy",           pixel: true, bottom: true },
-  linkedin: { title: "LinkedIn",   icon: "/linkedin.png", link: "https://www.linkedin.com/in/jacklhe/",       pixel: true, bottom: true },
-  bank:     { title: "RUNDLL",     icon: "/money.png",    width: 420, sound: true },
-  updatelog: { title: "UpdateLog", iconNode: <BookIcon />, icon: "/projects.png", width: 320, height: 460, noDesktop: true },
-  gallery:       { title: "Photo Gallery",  icon: "/icon-camera.png", width: 760, height: 560, pixel: true },
-  minesweeper:   { title: "Minesweeper",    iconNode: <MineIconNode />, icon: "/Minesweeper Logo.png", width: 310, height: 400, gridRow: 5, gridColumn: 1, iconSize: 50 },
-  email:         { title: "Send Mail",     iconNode: <EmailIconNode />, icon: "/Email.png", width: 500, height: 420 },
+  welcome:  { title: "Welcome",    icon: "/assets/welcome/welcome.png", width: 300, pixel: true },
+  about:    { title: "About Me", icon: "/assets/about/msagent.png", width: 760, height: 480, pixel: true },
+  projects: { title: "Projects",   icon: "/assets/projects/projects.png", width: 420, height: 220, pixel: true },
+  resume:   { title: "Resume",     icon: "/assets/resume/resume.png",   width: 680, height: 860, pixel: true, gridRow: 3, gridColumn: 2 },
+  github:   { title: "GitHub",     icon: "/assets/social/icon-github.png",   link: "https://github.com/Darkest-Teddy",           pixel: true, bottom: true },
+  linkedin: { title: "LinkedIn",   icon: "/assets/social/linkedin.png", link: "https://www.linkedin.com/in/jacklhe/",       pixel: true, bottom: true },
+  bank:     { title: "RUNDLL",     icon: "/assets/bank/money.png",    width: 420, sound: true },
+  updatelog: { title: "UpdateLog", iconNode: <BookIcon />, icon: "/assets/projects/projects.png", width: 320, height: 460, noDesktop: true },
+  gallery:       { title: "Photo Gallery",  icon: "/assets/gallery/icon-camera.png", width: 760, height: 560, pixel: true },
+  minesweeper:   { title: "Minesweeper",    iconNode: <MineIconNode />, icon: "/assets/minesweeper/Minesweeper Logo.png", width: 310, height: 400, gridRow: 5, gridColumn: 1, iconSize: 50 },
+  email:         { title: "Send Mail",     iconNode: <EmailIconNode />, icon: "/assets/email/Email.png", width: 500, height: 420 },
   sapling: {
-    title: "Sapling", iconNode: <SaplingIcon />, icon: "/sapling-icon.svg", width: 256,
+    title: "Sapling", iconNode: <SaplingIcon />, icon: "/assets/sapling/sapling-icon.svg", width: 256,
     titlebarBg: "linear-gradient(180deg,#39a552,#1f7a33)", titlebarColor: "#fff",
   },
   mario: {
-    title: "super-artificial-bros", iconNode: <MarioIcon />, icon: "/mario.gif", width: 256,
+    title: "super-artificial-bros", iconNode: <MarioIcon />, icon: "/assets/mario/mario.gif", width: 256,
     titlebarBg: "linear-gradient(180deg,#e0392c,#b5231a)", titlebarColor: "#fff",
   },
   stalk: {
-    title: "Stalk Market", iconNode: <StalkIcon />, icon: "/chicken.png", width: 256,
+    title: "Stalk Market", iconNode: <StalkIcon />, icon: "/assets/stalk/chicken.png", width: 256,
     titlebarBg: "linear-gradient(180deg,#ffcf3f,#dda000)", titlebarColor: "#3a2600",
   },
 };
@@ -489,9 +489,9 @@ const APPS = {
 const PROJECT_IDS = ["sapling", "mario", "stalk"];
 
 const PROJECTS = [
-  { id: "sapling", name: "Sapling",               color: "#3fb950", img: "/thumb-sapling.png",      url: "https://saplinglearn.com",                                    icon: "/sapling-icon.svg" },
-  { id: "mario",   name: "Super Artificial Bros.", color: "#e34c26", img: "/thumb-mario.png",        url: "https://devpost.com/software/superartificialbrothers",        icon: "/mario.gif" },
-  { id: "stalk",   name: "Stalk Market",           color: "#9d4edd", img: "/thumb-stalk-market.png", url: "https://stalk-market.vercel.app/",                            icon: "/chicken.png" },
+  { id: "sapling", name: "Sapling",               color: "#3fb950", img: "/assets/sapling/thumb-sapling.png",      url: "https://saplinglearn.com",                                    icon: "/assets/sapling/sapling-icon.svg" },
+  { id: "mario",   name: "Super Artificial Bros.", color: "#e34c26", img: "/assets/mario/thumb-mario.png",        url: "https://devpost.com/software/superartificialbrothers",        icon: "/assets/mario/mario.gif" },
+  { id: "stalk",   name: "Stalk Market",           color: "#9d4edd", img: "/assets/stalk/thumb-stalk-market.png", url: "https://stalk-market.vercel.app/",                            icon: "/assets/stalk/chicken.png" },
 ];
 
 const TASKBAR_H = 32;
@@ -583,7 +583,7 @@ function Win95Window({ id, win, active, onFocus, onClose, onMin, onMax, onMove, 
       resizeRef={!isProject ? resizeRef : undefined}
     >
       {/* Goomba walks above the Mario window titlebar */}
-      {id === "mario" && <GoombaWalker src="/goomba-walk.gif" alt="" />}
+      {id === "mario" && <GoombaWalker src="/assets/mario/goomba-walk.gif" alt="" />}
 
       <GradientHeader
         active={active}
@@ -625,14 +625,14 @@ function Win95Window({ id, win, active, onFocus, onClose, onMin, onMax, onMove, 
 function WelcomeBody() {
   return (
     <div style={{ textAlign: "center" }}>
-      <img src="/car.gif" alt="" style={{ width: 128, height: 128, borderRadius: "50%", border: "2px solid #d1d0d0", objectFit: "cover" }} />
+      <img src="/assets/welcome/car.gif" alt="" style={{ width: 128, height: 128, borderRadius: "50%", border: "2px solid #d1d0d0", objectFit: "cover" }} />
       <h1 style={{ margin: "6px 0", fontSize: 34, fontWeight: "bold", lineHeight: 1 }}>'95 OS</h1>
       <p style={{ margin: "0 0 8px" }}>Seems like yesterday...<br />Developed by Jack He</p>
       <a href="https://github.com/Darkest-Teddy" target="_blank" rel="noreferrer">Github</a>
       <div style={{ display: "flex", justifyContent: "center", gap: 4, marginTop: 12 }}>
-        <img src="/bestviewed.gif" alt="" style={{ imageRendering: "pixelated" }} />
-        <img src="/noframes3.gif" alt="" style={{ imageRendering: "pixelated" }} />
-        <img src="/notepadpowered.gif" alt="" style={{ imageRendering: "pixelated" }} />
+        <img src="/assets/shared/bestviewed.gif" alt="" style={{ imageRendering: "pixelated" }} />
+        <img src="/assets/shared/noframes3.gif" alt="" style={{ imageRendering: "pixelated" }} />
+        <img src="/assets/shared/notepadpowered.gif" alt="" style={{ imageRendering: "pixelated" }} />
       </div>
     </div>
   );
@@ -653,10 +653,10 @@ const ABOUT_EXP = [
   { role:"Microelectronics & Hardware Dev Student", org:"MIT Lincoln Labs Beaver Works", date:"Jul – Aug 2024", desc:"Selected as 1 of 41 students nationally. Hands-on IC design, PCB layout, and microchip fabrication." },
 ];
 const ABOUT_HACKS = [
-  { name:"Waymark", date:"May 2026", win:"Best Overall · Red Hat Open Accelerator", stack:"Llama 3.1 8B · Python · React · ChromaDB", desc:"Multimodal RAG over Google Drive and Slack, delivering sub-2s answers at 93.6% accuracy across 847 documents.", logo:"/logo-openaccel.png", logoBg:"#fff" },
-  { name:"Sapling", date:"Feb 2026", win:"AI Tutor Track Winner · BU CivicHacks 2026", stack:"Next.js · FastAPI · D3.js · WebSockets", desc:"Open-source AI study platform with Socratic, expository, and teach-back modes plus a real-time knowledge graph.", logo:"/logo-civichacks.png", logoBg:"#0a0a0a" },
-  { name:"Stalk Market", date:"Oct 2025", win:"Best Technical Execution · BU Data Science + X", stack:"OpenAI · Python · JavaScript", desc:"Stock market simulation with Geometric Brownian Motion pricing and adaptive AI trading agents.", logo:"/logo-dsx.png", logoBg:"#1a1a2e" },
-  { name:"Super Artificial Bros.", date:"Oct 2025", win:"Best Use of AI & LLMs · BostonHacks 2025", stack:"Gemini API · Python · JavaScript · Node.js", desc:"AI-generated Mario game with procedural levels and an NPC relationship system.", logo:"/logo-bostonhacks.png", logoBg:"#65b0f1" },
+  { name:"Waymark", date:"May 2026", win:"Best Overall · Red Hat Open Accelerator", stack:"Llama 3.1 8B · Python · React · ChromaDB", desc:"Multimodal RAG over Google Drive and Slack, delivering sub-2s answers at 93.6% accuracy across 847 documents.", logo:"/assets/about/logo-openaccel.png", logoBg:"#fff" },
+  { name:"Sapling", date:"Feb 2026", win:"AI Tutor Track Winner · BU CivicHacks 2026", stack:"Next.js · FastAPI · D3.js · WebSockets", desc:"Open-source AI study platform with Socratic, expository, and teach-back modes plus a real-time knowledge graph.", logo:"/assets/about/logo-civichacks.png", logoBg:"#0a0a0a" },
+  { name:"Stalk Market", date:"Oct 2025", win:"Best Technical Execution · BU Data Science + X", stack:"OpenAI · Python · JavaScript", desc:"Stock market simulation with Geometric Brownian Motion pricing and adaptive AI trading agents.", logo:"/assets/about/logo-dsx.png", logoBg:"#1a1a2e" },
+  { name:"Super Artificial Bros.", date:"Oct 2025", win:"Best Use of AI & LLMs · BostonHacks 2025", stack:"Gemini API · Python · JavaScript · Node.js", desc:"AI-generated Mario game with procedural levels and an NPC relationship system.", logo:"/assets/about/logo-bostonhacks.png", logoBg:"#65b0f1" },
 ];
 const ABOUT_AWARDS = [
   { name:"Best Use of AI & LLMs Track Winner", desc:"at Boston Hacks 2025 for Super Artificial Bros." },
@@ -667,10 +667,10 @@ const ABOUT_AWARDS = [
   { name:"3rd Place – 2024 IEEE SSCS Arduino Contest", desc:"cheap automated lighting system in C++ with Arduino hardware" },
 ];
 const ABOUT_LINKS = [
-  { href:"https://github.com/Darkest-Teddy",       icon:"/icon-github.png",   label:"github.com/Darkest-Teddy",    sub:"Code, projects, and hackathon repos" },
-  { href:"https://www.linkedin.com/in/jacklhe/",   icon:"/linkedin.png", label:"linkedin.com/in/jacklhe",     sub:"Professional profile" },
-  { href:"https://jacklhe.com",                    icon:"/icon-ie.png",       label:"jacklhe.com",                 sub:"Personal website" },
-  { href:"mailto:jackhe@bu.edu",                   icon:"/icon-email.png",    label:"jackhe@bu.edu",               sub:"Email" },
+  { href:"https://github.com/Darkest-Teddy",       icon:"/assets/social/icon-github.png",   label:"github.com/Darkest-Teddy",    sub:"Code, projects, and hackathon repos" },
+  { href:"https://www.linkedin.com/in/jacklhe/",   icon:"/assets/social/linkedin.png", label:"linkedin.com/in/jacklhe",     sub:"Professional profile" },
+  { href:"https://jacklhe.com",                    icon:"/assets/shared/icon-ie.png",       label:"jacklhe.com",                 sub:"Personal website" },
+  { href:"mailto:jackhe@bu.edu",                   icon:"/assets/email/icon-email.png",    label:"jackhe@bu.edu",               sub:"Email" },
 ];
 
 function aboutBadgeFg(hex) {
@@ -679,11 +679,11 @@ function aboutBadgeFg(hex) {
 }
 
 function AboutFolderIcon() {
-  return <img src="/folder.png" alt="" style={{ width:17, height:15, flexShrink:0, imageRendering:"pixelated" }} />;
+  return <img src="/assets/projects/folder.png" alt="" style={{ width:17, height:15, flexShrink:0, imageRendering:"pixelated" }} />;
 }
 
 function AboutTrophySVG() {
-  return <img src="/trophy.png" alt="" style={{ width:18, height:18, flexShrink:0, imageRendering:"pixelated", marginTop:1 }} />;
+  return <img src="/assets/about/trophy.png" alt="" style={{ width:18, height:18, flexShrink:0, imageRendering:"pixelated", marginTop:1 }} />;
 }
 
 function AboutBody() {
@@ -736,7 +736,7 @@ function AboutBody() {
                 <Heading text="About Me" />
                 <div style={{ display:"flex", gap:16, alignItems:"flex-start" }}>
                   <div style={{ flexShrink:0, padding:3, background:"#c0c0c0", boxShadow:sunken }}>
-                    <img src="/profile-pixel.png" alt="Jack He"
+                    <img src="/assets/about/profile-pixel.png" alt="Jack He"
                       style={{ width:128, height:128, display:"block", imageRendering:"pixelated", objectFit:"cover" }} />
                   </div>
                   <div style={{ flex:1, minWidth:0, fontSize:15, lineHeight:1.7, color:"#000" }}>
@@ -792,7 +792,7 @@ function AboutBody() {
               <div>
                 <Heading text="Education" />
                 <div style={{ background:"#fff", boxShadow:raised, padding:"12px 14px", display:"flex", gap:12, alignItems:"flex-start" }}>
-                  <img src="/gradcap.png" alt="" style={{ width:26, height:26, flexShrink:0, imageRendering:"pixelated" }} />
+                  <img src="/assets/about/gradcap.png" alt="" style={{ width:26, height:26, flexShrink:0, imageRendering:"pixelated" }} />
                   <div>
                     <div style={{ fontSize:16, fontWeight:"bold", color:"#000", marginBottom:4 }}>B.S. Computer Science</div>
                     <div style={{ fontSize:14, color:"#555" }}>Boston University · Minor in Data Science · GPA 3.93 · Expected 2029</div>
@@ -889,7 +889,7 @@ function SaplingAd() {
         A HEALTHY MIND, NATURALLY™
       </div>
       <div style={{ margin: "7px 0 0", border: "2px solid", borderColor: "#808080 #fff #fff #808080", background: "#0d5c22", lineHeight: 0 }}>
-        <img src="/thumb-sapling.png" alt="Sapling" style={{ width: "100%", height: "auto", display: "block" }} />
+        <img src="/assets/sapling/thumb-sapling.png" alt="Sapling" style={{ width: "100%", height: "auto", display: "block" }} />
       </div>
       <p style={{ margin: "6px 0 0", fontFamily: "Georgia,'Times New Roman',serif", fontSize: 12, lineHeight: 1.42, color: "#184b23", textAlign: "center" }}>
         Made for university students. Add your courses and our custom <b>LLM model</b> grows a living knowledge graph, personalized to exactly what you're studying.
@@ -930,7 +930,7 @@ function MarioAd() {
         </span>
       </div>
       <div style={{ margin: "6px 0 0", border: "2px solid", borderColor: "#808080 #fff #fff #808080", background: "#000", lineHeight: 0 }}>
-        <img src="/thumb-mario.png" alt="Super Artificial Bros." style={{ width: "100%", height: "auto", display: "block", imageRendering: "pixelated" }} />
+        <img src="/assets/mario/thumb-mario.png" alt="Super Artificial Bros." style={{ width: "100%", height: "auto", display: "block", imageRendering: "pixelated" }} />
       </div>
       <div style={{ fontStyle: "italic", fontWeight: 700, fontSize: 11, fontFamily: "Georgia,serif", color: "#12314f", textAlign: "center", marginTop: 5 }}>
         The classic platformer, now endless
@@ -973,7 +973,7 @@ function StalkAd() {
           BUY LOW.<br />GROW HIGH.
         </div>
         <div style={{ margin: "7px 0 0", border: "2px solid", borderColor: "#808080 #fff #fff #808080", background: "#000", lineHeight: 0 }}>
-          <img src="/thumb-stalk-market.png" alt="Stalk Market" style={{ width: "100%", height: "auto", display: "block", imageRendering: "pixelated" }} />
+          <img src="/assets/stalk/thumb-stalk-market.png" alt="Stalk Market" style={{ width: "100%", height: "auto", display: "block", imageRendering: "pixelated" }} />
         </div>
         <div style={{ margin: "6px 0 0", fontFamily: "'W95FA',Tahoma,sans-serif", fontWeight: 400, fontSize: 11, lineHeight: 1.42, color: "#123b1f", textAlign: "center" }}>
           Learn to invest by farming the market. Stocks are plants that grow &amp; wilt on real Geometric Brownian Motion + an ML risk engine.
@@ -991,7 +991,7 @@ function StalkAd() {
       </div>
 
       {/* Chicken peeks out bottom-right of the window */}
-      <img src="/chicken.png" alt="" style={{ position: "absolute", right: -32, bottom: -12, width: 60, height: "auto", imageRendering: "pixelated", transform: "scaleX(-1)", filter: "drop-shadow(2px 3px 2px rgba(0,0,0,.35))", pointerEvents: "none" }} />
+      <img src="/assets/stalk/chicken.png" alt="" style={{ position: "absolute", right: -32, bottom: -12, width: 60, height: "auto", imageRendering: "pixelated", transform: "scaleX(-1)", filter: "drop-shadow(2px 3px 2px rgba(0,0,0,.35))", pointerEvents: "none" }} />
     </div>
   );
 }
@@ -1040,7 +1040,7 @@ function ResumeBody() {
       <div ref={containerRef}
         style={{ flex: 1, overflow: "auto", background: "#808080", padding: 8, minHeight: 0 }}>
         <Document
-          file="/resume.pdf"
+          file="/assets/resume/resume.pdf"
           onLoadSuccess={({ numPages }) => setNumPages(numPages)}
           loading={<p style={{ color: "#fff", padding: 12 }}>Loading resume...</p>}
           error={<p style={{ color: "#fff", padding: 12 }}>Could not load resume.pdf</p>}
@@ -1077,7 +1077,7 @@ function ProjectsBody() {
 function BankBody() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 14px" }}>
-      <img src="/error.png" alt="Error" style={{ width: 32, height: 32, flexShrink: 0 }} />
+      <img src="/assets/shared/error.png" alt="Error" style={{ width: 32, height: 32, flexShrink: 0 }} />
       <div style={{ textAlign: "left" }}>
         <p style={{ margin: "2px 0" }}>Error loading bankaccountinformation.exe</p>
         <p style={{ margin: "2px 0" }}>One of the library files needed to run this application cannot be found.</p>
@@ -1129,7 +1129,7 @@ function UpdateLogBody() {
         fontFamily: "'W95FA',Tahoma,sans-serif", fontSize: 15, color: "#000",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 10 }}>
-          <img src="/info-icon.png" alt="" style={{ width: 22, height: 22, imageRendering: "pixelated", flexShrink: 0 }} />
+          <img src="/assets/shared/info-icon.png" alt="" style={{ width: 22, height: 22, imageRendering: "pixelated", flexShrink: 0 }} />
           <span style={{ fontWeight: "bold", fontSize: 20, color: "#000" }}>New Updates...</span>
         </div>
         {UPDATE_LOG.map((entry, i) => {
@@ -1201,7 +1201,7 @@ function GalleryBody() {
 
   const caps = f ? (GALLERY_CAPS[f.id]||[]) : [];
   const photos = f ? Array.from({length:f.count},(_,i)=>({
-    src:'/gallery/'+f.id+'/'+(i+1)+'.'+(f.ext||'jpg'),
+    src:'/assets/gallery/'+f.id+'/'+(i+1)+'.'+(f.ext||'jpg'),
     cap: caps[i]||('Photo '+(i+1)),
     file:'DSC0'+String(100+i).padStart(4,'0')+'.JPG',
     sel: loc.sel===i,
@@ -1217,7 +1217,7 @@ function GalleryBody() {
     const p = loc.sel>=0 ? photos[loc.sel] : null;
     panel = p
       ? {title:p.cap, desc:'', preview:p.src, details:[{k:'File',v:p.file},{k:'Folder',v:f.name}]}
-      : {title:f.name, desc:f.count?'Double-click a photo to open it.':'No photos yet. Add images to /gallery/'+f.id+'/', preview:null, details:[{k:'Photos',v:f.count||'—'}]};
+      : {title:f.name, desc:f.count?'Double-click a photo to open it.':'No photos yet. Add images to /assets/gallery/'+f.id+'/', preview:null, details:[{k:'Photos',v:f.count||'—'}]};
   }
 
   const pathText = isFolders ? 'My Pictures'
@@ -1261,23 +1261,23 @@ function GalleryBody() {
       {/* Toolbar */}
       <div style={{ flexShrink:0, display:'flex', alignItems:'center', gap:1, padding:'3px 4px', borderTop:'1px solid #fff', borderBottom:'1px solid #808080' }}>
         <TbBtn onClick={back} disabled={!canBack}>
-          <img src="/icon-arrow.png" alt="" style={{width:26,height:26,imageRendering:'pixelated'}} />
+          <img src="/assets/gallery/icon-arrow.png" alt="" style={{width:26,height:26,imageRendering:'pixelated'}} />
           <span>Back</span>
         </TbBtn>
         <TbBtn onClick={forward} disabled={!canFwd}>
-          <img src="/icon-arrow.png" alt="" style={{width:26,height:26,imageRendering:'pixelated',transform:'scaleX(-1)'}} />
+          <img src="/assets/gallery/icon-arrow.png" alt="" style={{width:26,height:26,imageRendering:'pixelated',transform:'scaleX(-1)'}} />
           <span>Forward</span>
         </TbBtn>
         <TbBtn onClick={() => {
           if (isViewer) go({view:'folder', folderId:loc.folderId, vi:0, sel:loc.vi});
           else if (isFolder) { const idx=GALLERY_FOLDERS.findIndex(x=>x.id===loc.folderId); go({view:'folders',folderId:null,vi:0,sel:idx}); }
         }} disabled={isFolders}>
-          <img src="/uparrow.png" alt="" style={{width:26,height:26,imageRendering:'pixelated'}} />
+          <img src="/assets/shared/uparrow.png" alt="" style={{width:26,height:26,imageRendering:'pixelated'}} />
           <span>Up</span>
         </TbBtn>
         <div style={{width:2,height:26,margin:'0 4px',borderLeft:'1px solid #808080',borderRight:'1px solid #fff'}}/>
         <TbBtn>
-          <img src="/views.png" alt="" style={{width:22,height:22,imageRendering:'pixelated'}} />
+          <img src="/assets/shared/views.png" alt="" style={{width:22,height:22,imageRendering:'pixelated'}} />
           <span>Views</span>
         </TbBtn>
       </div>
@@ -1286,7 +1286,7 @@ function GalleryBody() {
       <div style={{ flexShrink:0, display:'flex', alignItems:'center', gap:6, padding:'3px 6px', borderBottom:'1px solid #808080' }}>
         <span style={{ fontSize:12, color:'#404040' }}>Address</span>
         <div style={{ flex:1, display:'flex', alignItems:'center', gap:5, height:22, padding:'0 2px 0 4px', background:'#fff', boxShadow:sunken }}>
-          <img src="/icon-camera.png" alt="" style={{width:15,height:15,imageRendering:'pixelated',flexShrink:0}}/>
+          <img src="/assets/gallery/icon-camera.png" alt="" style={{width:15,height:15,imageRendering:'pixelated',flexShrink:0}}/>
           <span style={{flex:1,fontSize:13,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{pathText}</span>
           <div style={{width:16,height:18,background:'#c0c0c0',border:'1px solid',borderColor:'#fff #404040 #404040 #fff',boxShadow:'inset 1px 1px 0 #dfdfdf,inset -1px -1px 0 #808080',display:'flex',alignItems:'center',justifyContent:'center',fontSize:9}}>▼</div>
         </div>
@@ -1352,7 +1352,7 @@ function GalleryBody() {
                       onClick={()=>setSel(i)}
                       onDoubleClick={()=>go({view:'folder',folderId:fo.id,vi:0,sel:-1})}
                       style={{ width:100, display:'flex', flexDirection:'column', alignItems:'center', gap:4, padding:'6px 4px', cursor:'default', userSelect:'none' }}>
-                      <img src="/icon-picfolder.png" alt="" style={{ width:48, imageRendering:'pixelated' }} onError={e=>{ e.target.style.opacity='0.4'; }}/>
+                      <img src="/assets/gallery/icon-picfolder.png" alt="" style={{ width:48, imageRendering:'pixelated' }} onError={e=>{ e.target.style.opacity='0.4'; }}/>
                       <div style={{ fontSize:12, textAlign:'center', padding:'1px 4px', background:sel?'#000080':'transparent', color:sel?'#fff':'#000', outline:sel?'1px dotted #fff':'none', outlineOffset:-1 }}>
                         {fo.name}
                       </div>
@@ -1622,7 +1622,7 @@ function MinesweeperBody() {
               onMouseDown={e => { e.currentTarget.style.borderColor = '#808080 #fff #fff #808080'; }}
               onMouseUp={e => { e.currentTarget.style.borderColor = '#fff #808080 #808080 #fff'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = '#fff #808080 #808080 #fff'; }}>
-              <img src={smileyState === 'dead' ? '/Minesweeper - Lost.png' : smileyState === 'cool' ? '/Minesweeper - Won.png' : '/Minesweeper - Idle.png'} alt="" style={{ width: 24, height: 24, imageRendering: 'pixelated' }} />
+              <img src={smileyState === 'dead' ? '/assets/minesweeper/Minesweeper - Lost.png' : smileyState === 'cool' ? '/assets/minesweeper/Minesweeper - Won.png' : '/assets/minesweeper/Minesweeper - Idle.png'} alt="" style={{ width: 24, height: 24, imageRendering: 'pixelated' }} />
             </button>
             <LcdPanel value={time} digits={3} />
           </div>
@@ -1705,7 +1705,7 @@ function EmailBody() {
   if (status === 'sent') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 14, fontFamily: "'W95FA', sans-serif", fontSize: 13, background: '#c0c0c0' }}>
-        <img src="/Email.png" alt="" style={{ width: 48, height: 48, imageRendering: 'pixelated', objectFit: 'contain' }} />
+        <img src="/assets/email/Email.png" alt="" style={{ width: 48, height: 48, imageRendering: 'pixelated', objectFit: 'contain' }} />
         <p style={{ margin: 0 }}>Message sent!</p>
         <W95Btn onClick={() => { setForm({ from: '', subject: '', message: '' }); setStatus('idle'); }}>New Message</W95Btn>
       </div>
@@ -1725,15 +1725,18 @@ function EmailBody() {
         ))}
       </div>
 
+      {/* Content wrapper — 3px side padding matches About Me's panel inset */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '0 3px 3px', minHeight: 0 }}>
+
       {/* Header fields */}
-      <div style={{ flexShrink: 0, padding: '5px 8px 3px', borderBottom: '1px solid #808080' }}>
+      <div style={{ flexShrink: 0, padding: '5px 5px 3px', borderBottom: '1px solid #808080' }}>
         {/* To row with Send button */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
           <span style={{ width: 56, flexShrink: 0, textAlign: 'right', paddingRight: 6, userSelect: 'none' }}>To:</span>
           <input readOnly value="jackhe@bu.edu" style={{ ...inputStyle, background: '#c0c0c0', userSelect: 'none', flex: 1 }} />
           <div style={{ marginLeft: 6, flexShrink: 0 }}>
             <W95Btn onClick={handleSend} disabled={status === 'sending'}>
-              <img src="/send.svg" alt="" style={{ width: 14, height: 14, objectFit: 'contain', display: 'block' }} />
+              <img src="/assets/email/Email.png" alt="" style={{ width: 14, height: 14, objectFit: 'contain', display: 'block' }} />
               Send
             </W95Btn>
           </div>
@@ -1770,12 +1773,14 @@ function EmailBody() {
 
       {/* Status — only shown when actionable */}
       {(status === 'sending' || status === 'error' || status === 'incomplete') && (
-        <div style={{ flexShrink: 0, padding: '2px 8px', fontSize: 12, background: '#c0c0c0', borderTop: '1px solid #808080' }}>
+        <div style={{ flexShrink: 0, padding: '2px 5px', fontSize: 12, background: '#c0c0c0', borderTop: '1px solid #808080' }}>
           {status === 'sending'    ? 'Sending...' :
            status === 'error'      ? `Error: ${errorMsg || 'could not send'}` :
                                      'Please fill in all fields.'}
         </div>
       )}
+
+      </div>{/* end content wrapper */}
     </div>
   );
 }
@@ -1831,12 +1836,12 @@ export default function App() {
     const gainNode = audioCtx.createGain();
     gainNode.gain.value = 3.0;
     gainNode.connect(audioCtx.destination);
-    const err = new Audio("/error.mp3");
+    const err = new Audio("/assets/shared/error.mp3");
     err.volume = 1.0;
     const errSource = audioCtx.createMediaElementSource(err);
     errSource.connect(gainNode);
     errorSound.current = err;
-    const chord = new Audio("/Windows 95 Chord Sound Effect (High Quality) (mp3cut.net) (1).mp3");
+    const chord = new Audio("/assets/shared/Windows 95 Chord Sound Effect (High Quality) (mp3cut.net) (1).mp3");
     chord.preload = "auto";
     chord.volume = 1.0;
     chord.load();
@@ -1908,7 +1913,7 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <GlobalStyles />
       <Wallpaper autoPlay loop muted playsInline>
-        <source src="/wallpaper.mp4" type="video/mp4" />
+        <source src="/assets/shared/wallpaper.mp4" type="video/mp4" />
       </Wallpaper>
 
       <Desktop onMouseDown={() => { setSelectedIcon(null); if (startOpen) setStartOpen(false); }}>
@@ -1997,7 +2002,7 @@ export default function App() {
                   fontSize: 14, cursor: "default", userSelect: "none", color: "#000" }}
                 onMouseEnter={e => { e.currentTarget.style.background = "#000080"; e.currentTarget.style.color = "#fff"; }}
                 onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#000"; }}>
-                <img src="/icon-github.png" alt="" style={{ width: 26, height: 26, imageRendering: "pixelated", mixBlendMode: "multiply", flexShrink: 0 }} />
+                <img src="/assets/social/icon-github.png" alt="" style={{ width: 26, height: 26, imageRendering: "pixelated", mixBlendMode: "multiply", flexShrink: 0 }} />
                 GitHub
               </div>
             </div>
@@ -2007,14 +2012,14 @@ export default function App() {
         <Taskbar style={{ top: "auto", bottom: 0, zIndex: 9999 }}>
           <Toolbar style={{ justifyContent: "flex-start", padding: 3, gap: 4, minHeight: 0 }}>
             <StartButton $active={startOpen} onMouseDown={e => { e.stopPropagation(); setStartOpen(s => !s); }}>
-              <StartImg src="/start.png" alt="" />
+              <StartImg src="/assets/shared/start.png" alt="" />
               Start
             </StartButton>
 
             <TaskbarBtns>
               {Object.entries(wins).filter(([, w]) => w.open).map(([id]) => (
                 <TaskbarWinBtn key={id} className={activeId === id && !wins[id].min ? "active" : ""} onClick={() => onTaskbarClick(id)}>
-                  {APPS[id].iconNode ?? <img src={APPS[id].icon ?? "/projects.png"} alt="" />}
+                  {APPS[id].iconNode ?? <img src={APPS[id].icon ?? "/assets/projects/projects.png"} alt="" />}
                   <span>{APPS[id].title}</span>
                 </TaskbarWinBtn>
               ))}
