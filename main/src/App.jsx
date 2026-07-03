@@ -284,6 +284,7 @@ const APPS = {
   linkedin: { title: "LinkedIn",   icon: "/linkedin.png", link: "https://www.linkedin.com/in/jacklhe/",       pixel: true, bottom: true },
   bank:     { title: "RUNDLL",     icon: "/money.png",    width: 420, sound: true },
   updatelog: { title: "UpdateLog", iconNode: <BookIcon />, icon: "/projects.png", width: 320, height: 460, noDesktop: true },
+  gallery:   { title: "Photo Gallery", icon: "/icon-camera.png", width: 760, height: 560, pixel: true },
   sapling: {
     title: "Sapling", iconNode: <SaplingIcon />, icon: "/sapling-icon.svg", width: 256,
     titlebarBg: "linear-gradient(180deg,#39a552,#1f7a33)", titlebarColor: "#fff",
@@ -309,7 +310,7 @@ const PROJECTS = [
 const TASKBAR_H = 32;
 const MIN_W = 200;
 const MIN_H = 120;
-const BODY_PAD = { welcome: 12, about: 0, projects: 0, bank: 0, resume: 0, updatelog: 0, sapling: 0, mario: 0, stalk: 0 };
+const BODY_PAD = { welcome: 12, about: 0, projects: 0, bank: 0, resume: 0, updatelog: 0, gallery: 0, sapling: 0, mario: 0, stalk: 0 };
 
 function randomPosition(width, height) {
   const maxX = Math.max(8, window.innerWidth  - width  - 8);
@@ -957,6 +958,268 @@ function UpdateLogBody() {
   );
 }
 
+/* ── Photo Gallery ── */
+const GALLERY_FOLDERS = [
+  { id:'hackathons', name:"Hackathons", count:10, desc:"Photos from hackathons and competitions." },
+];
+
+const GALLERY_CAPS = {
+  hackathons: [
+    "Working",
+    "Money",
+    "BostonHacks Win",
+    "BU DS + X Win",
+    "Civic Hacks Announcement",
+    "BU Civic Hacks Win",
+    "Presentations",
+    "Red Hat Win",
+    "Red Hat Win 2",
+    "Red Hat Logo",
+  ],
+};
+
+function GalleryBody() {
+  const [st, setSt] = useState({
+    hist: [{ view:'folders', folderId:null, vi:0, sel:-1 }],
+    hi: 0, zoom: 1, rot: 0,
+  });
+
+  const loc = st.hist[st.hi];
+  const f = loc.folderId ? GALLERY_FOLDERS.find(x => x.id === loc.folderId) : null;
+  const isFolders = loc.view === 'folders';
+  const isFolder  = loc.view === 'folder';
+  const isViewer  = loc.view === 'viewer';
+  const canBack = st.hi > 0;
+  const canFwd  = st.hi < st.hist.length - 1;
+
+  const update = fn => setSt(s => fn(s));
+  const go = next => update(s => { const hist=[...s.hist.slice(0,s.hi+1),next]; return {...s,hist,hi:hist.length-1,zoom:1,rot:0}; });
+  const back    = () => update(s => s.hi>0 ? {...s,hi:s.hi-1,zoom:1,rot:0} : s);
+  const forward = () => update(s => s.hi<s.hist.length-1 ? {...s,hi:s.hi+1,zoom:1,rot:0} : s);
+  const setSel  = i  => update(s => { const hist=[...s.hist]; hist[s.hi]={...hist[s.hi],sel:i}; return {...s,hist}; });
+  const step    = d  => update(s => {
+    const folder = GALLERY_FOLDERS.find(x => x.id === s.hist[s.hi].folderId);
+    if (!folder) return s;
+    const ni = Math.min(folder.count-1, Math.max(0, s.hist[s.hi].vi+d));
+    if (ni === s.hist[s.hi].vi) return s;
+    const hist=[...s.hist]; hist[s.hi]={...hist[s.hi],vi:ni,sel:ni};
+    return {...s,hist,zoom:1,rot:0};
+  });
+
+  const caps = f ? (GALLERY_CAPS[f.id]||[]) : [];
+  const photos = f ? Array.from({length:f.count},(_,i)=>({
+    src:'/gallery/'+f.id+'/'+(i+1)+'.'+(f.ext||'jpg'),
+    cap: caps[i]||('Photo '+(i+1)),
+    file:'DSC0'+String(100+i).padStart(4,'0')+'.JPG',
+    sel: loc.sel===i,
+  })) : [];
+
+  const cur = isViewer && photos[loc.vi] ? photos[loc.vi] : null;
+
+  let panel = { title:'My Pictures', desc:'Select a folder to see its photos.', preview:null, details:[{k:'Folders',v:GALLERY_FOLDERS.length}] };
+  if (isFolders && loc.sel>=0) {
+    const sf=GALLERY_FOLDERS[loc.sel];
+    panel={title:sf.name, desc:sf.desc, preview:null, details:[{k:'Type',v:'File Folder'},{k:'Photos',v:sf.count||'—'}]};
+  } else if (isFolder) {
+    const p = loc.sel>=0 ? photos[loc.sel] : null;
+    panel = p
+      ? {title:p.cap, desc:'', preview:p.src, details:[{k:'File',v:p.file},{k:'Folder',v:f.name}]}
+      : {title:f.name, desc:f.count?'Double-click a photo to open it.':'No photos yet. Add images to /gallery/'+f.id+'/', preview:null, details:[{k:'Photos',v:f.count||'—'}]};
+  }
+
+  const pathText = isFolders ? 'My Pictures'
+    : isFolder ? ('My Pictures\\'+f.name)
+    : ('My Pictures\\'+f.name+'\\'+(cur?.file||''));
+
+  const statusLeft  = isFolders ? (GALLERY_FOLDERS.length+' folder(s)')
+    : isFolder ? (f.count+' photo(s)')
+    : ('Photo '+(loc.vi+1)+' of '+f.count);
+  const statusMid   = isViewer ? (cur?.file||'') : (isFolder&&loc.sel>=0 ? '1 object(s) selected' : '');
+  const statusRight = isViewer ? (Math.round(st.zoom*100)+'%') : '';
+
+  const sunken = "inset 1px 1px 0 #808080, inset -1px -1px 0 #fff, inset 2px 2px 0 #404040, inset -2px -2px 0 #dfdfdf";
+
+  const TbBtn = ({ onClick, disabled, children }) => (
+    <div onClick={disabled ? undefined : onClick}
+      style={{ display:'flex', alignItems:'center', gap:4, padding:'2px 7px 2px 5px',
+        border:'1px solid transparent', cursor:'default', fontSize:13, userSelect:'none',
+        opacity: disabled ? 0.45 : 1 }}
+      onMouseEnter={e=>{ if(!disabled){ e.currentTarget.style.borderColor='#fff #404040 #404040 #fff'; e.currentTarget.style.boxShadow='inset 1px 1px 0 #dfdfdf,inset -1px -1px 0 #808080'; }}}
+      onMouseLeave={e=>{ e.currentTarget.style.borderColor='transparent'; e.currentTarget.style.boxShadow='none'; }}
+      onMouseDown={e=>{ if(!disabled){ e.currentTarget.style.borderColor='#404040 #fff #fff #404040'; e.currentTarget.style.boxShadow='inset 1px 1px 0 #808080'; }}}
+      onMouseUp={e=>{ e.currentTarget.style.borderColor='transparent'; e.currentTarget.style.boxShadow='none'; }}
+    >{children}</div>
+  );
+
+  return (
+    <div style={{ display:'flex', flexDirection:'column', height:'100%', overflow:'hidden', fontFamily:"'W95FA',Tahoma,sans-serif", fontSize:13, color:'#000' }}>
+
+      {/* Menu bar */}
+      <div style={{ height:20, flexShrink:0, display:'flex', alignItems:'center', padding:'2px 2px 0', fontSize:13, userSelect:'none', cursor:'default' }}>
+        {['File','Edit','View','Go','Favorites','Help'].map(m=>(
+          <span key={m} style={{ padding:'1px 7px' }}
+            onMouseEnter={e=>{ e.currentTarget.style.background='#000080'; e.currentTarget.style.color='#fff'; }}
+            onMouseLeave={e=>{ e.currentTarget.style.background='transparent'; e.currentTarget.style.color='#000'; }}>
+            <span style={{textDecoration:'underline'}}>{m[0]}</span>{m.slice(1)}
+          </span>
+        ))}
+      </div>
+
+      {/* Toolbar */}
+      <div style={{ flexShrink:0, display:'flex', alignItems:'center', gap:1, padding:'3px 4px', borderTop:'1px solid #fff', borderBottom:'1px solid #808080' }}>
+        <TbBtn onClick={back} disabled={!canBack}>
+          <img src="/icon-arrow.png" alt="" style={{width:26,height:26,imageRendering:'pixelated'}} />
+          <span>Back</span>
+        </TbBtn>
+        <TbBtn onClick={forward} disabled={!canFwd}>
+          <img src="/icon-arrow.png" alt="" style={{width:26,height:26,imageRendering:'pixelated',transform:'scaleX(-1)'}} />
+          <span>Forward</span>
+        </TbBtn>
+        <TbBtn onClick={() => {
+          if (isViewer) go({view:'folder', folderId:loc.folderId, vi:0, sel:loc.vi});
+          else if (isFolder) { const idx=GALLERY_FOLDERS.findIndex(x=>x.id===loc.folderId); go({view:'folders',folderId:null,vi:0,sel:idx}); }
+        }} disabled={isFolders}>
+          <img src="/uparrow.png" alt="" style={{width:26,height:26,imageRendering:'pixelated'}} />
+          <span>Up</span>
+        </TbBtn>
+        <div style={{width:2,height:26,margin:'0 4px',borderLeft:'1px solid #808080',borderRight:'1px solid #fff'}}/>
+        <TbBtn>
+          <img src="/views.png" alt="" style={{width:22,height:22,imageRendering:'pixelated'}} />
+          <span>Views</span>
+        </TbBtn>
+      </div>
+
+      {/* Address bar */}
+      <div style={{ flexShrink:0, display:'flex', alignItems:'center', gap:6, padding:'3px 6px', borderBottom:'1px solid #808080' }}>
+        <span style={{ fontSize:12, color:'#404040' }}>Address</span>
+        <div style={{ flex:1, display:'flex', alignItems:'center', gap:5, height:22, padding:'0 2px 0 4px', background:'#fff', boxShadow:sunken }}>
+          <img src="/icon-camera.png" alt="" style={{width:15,height:15,imageRendering:'pixelated',flexShrink:0}}/>
+          <span style={{flex:1,fontSize:13,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{pathText}</span>
+          <div style={{width:16,height:18,background:'#c0c0c0',border:'1px solid',borderColor:'#fff #404040 #404040 #fff',boxShadow:'inset 1px 1px 0 #dfdfdf,inset -1px -1px 0 #808080',display:'flex',alignItems:'center',justifyContent:'center',fontSize:9}}>▼</div>
+        </div>
+      </div>
+
+      {/* Viewer toolbar */}
+      {isViewer && (
+        <div style={{ flexShrink:0, display:'flex', alignItems:'center', gap:2, padding:'3px 5px', borderBottom:'1px solid #808080' }}>
+          {[['Zoom Out',()=>update(s=>({...s,zoom:Math.max(0.25,+(s.zoom/1.25).toFixed(3))}))],
+            ['Zoom In', ()=>update(s=>({...s,zoom:Math.min(4,+(s.zoom*1.25).toFixed(3))}))],
+            ['Actual Size',()=>update(s=>({...s,zoom:1,rot:0}))]
+          ].map(([l,fn])=>(
+            <button key={l} onClick={fn} style={{padding:'2px 10px',fontSize:13,background:'#c0c0c0',border:'1px solid',borderColor:'#fff #404040 #404040 #fff',boxShadow:'inset 1px 1px 0 #dfdfdf,inset -1px -1px 0 #808080',cursor:'default'}}>{l}</button>
+          ))}
+          <div style={{width:2,height:20,margin:'0 5px',borderLeft:'1px solid #808080',borderRight:'1px solid #fff'}}/>
+          {[['↺ Rotate',()=>update(s=>({...s,rot:s.rot-90}))],['↻ Rotate',()=>update(s=>({...s,rot:s.rot+90}))]].map(([l,fn])=>(
+            <button key={l} onClick={fn} style={{padding:'2px 10px',fontSize:13,background:'#c0c0c0',border:'1px solid',borderColor:'#fff #404040 #404040 #fff',boxShadow:'inset 1px 1px 0 #dfdfdf,inset -1px -1px 0 #808080',cursor:'default'}}>{l}</button>
+          ))}
+          <div style={{width:2,height:20,margin:'0 5px',borderLeft:'1px solid #808080',borderRight:'1px solid #fff'}}/>
+          <button onClick={()=>step(-1)} disabled={loc.vi===0} style={{padding:'2px 12px',fontSize:13,background:'#c0c0c0',border:'1px solid',borderColor:'#fff #404040 #404040 #fff',boxShadow:'inset 1px 1px 0 #dfdfdf,inset -1px -1px 0 #808080',cursor:'default',opacity:loc.vi===0?0.5:1}}>◄ Prev</button>
+          <button onClick={()=>step(1)} disabled={!f||loc.vi>=f.count-1} style={{padding:'2px 12px',fontSize:13,background:'#c0c0c0',border:'1px solid',borderColor:'#fff #404040 #404040 #fff',boxShadow:'inset 1px 1px 0 #dfdfdf,inset -1px -1px 0 #808080',cursor:'default',opacity:!f||loc.vi>=f.count-1?0.5:1}}>Next ►</button>
+        </div>
+      )}
+
+      {/* Main body */}
+      <div style={{ flex:1, minHeight:0, display:'flex', padding:3, gap:3 }}>
+
+        {/* Left panel */}
+        {!isViewer && (
+          <div style={{ width:190, flexShrink:0, background:'#fff', boxShadow:sunken, display:'flex', flexDirection:'column', overflow:'hidden' }}>
+            <div style={{ height:5, flexShrink:0, background:'linear-gradient(90deg,#000080,#1084d0)' }}/>
+            <div style={{ flex:1, minHeight:0, overflowY:'auto', padding:'14px 14px 10px' }}>
+              <div style={{ fontSize:18, fontWeight:'bold', color:'#000080', lineHeight:1.2, marginBottom:3 }}>{panel.title}</div>
+              <div style={{ height:2, background:'#808080', borderBottom:'1px solid #fff', margin:'6px 0 10px' }}/>
+              {panel.desc && <div style={{ fontSize:12, color:'#000080', lineHeight:1.55, marginBottom:10 }}>{panel.desc}</div>}
+              {panel.preview && (
+                <div style={{ padding:3, background:'#fff', boxShadow:sunken, marginBottom:10 }}>
+                  <img src={panel.preview} alt="" style={{ display:'block', width:'100%', height:'auto' }} onError={e=>{ e.target.style.display='none'; }}/>
+                </div>
+              )}
+              {panel.details.map(({k,v})=>(
+                <div key={k} style={{ display:'flex', gap:5, fontSize:12, lineHeight:1.7 }}>
+                  <span style={{ color:'#808080', flexShrink:0 }}>{k}:</span>
+                  <span>{v}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ flexShrink:0, padding:'6px 14px 10px', fontSize:11, color:'#808080' }}>My Pictures</div>
+          </div>
+        )}
+
+        {/* Content */}
+        <div style={{ flex:1, minWidth:0 }}>
+
+          {/* Folder grid */}
+          {isFolders && (
+            <div style={{ height:'100%', overflowY:'auto', background:'#fff', boxShadow:sunken }}>
+              <div style={{ display:'flex', flexWrap:'wrap', alignContent:'flex-start', gap:6, padding:12 }}>
+                {GALLERY_FOLDERS.map((fo,i)=>{
+                  const sel=loc.sel===i;
+                  return (
+                    <div key={fo.id}
+                      onClick={()=>setSel(i)}
+                      onDoubleClick={()=>go({view:'folder',folderId:fo.id,vi:0,sel:-1})}
+                      style={{ width:100, display:'flex', flexDirection:'column', alignItems:'center', gap:4, padding:'6px 4px', cursor:'default', userSelect:'none' }}>
+                      <img src="/icon-picfolder.png" alt="" style={{ width:48, imageRendering:'pixelated' }} onError={e=>{ e.target.style.opacity='0.4'; }}/>
+                      <div style={{ fontSize:12, textAlign:'center', padding:'1px 4px', background:sel?'#000080':'transparent', color:sel?'#fff':'#000', outline:sel?'1px dotted #fff':'none', outlineOffset:-1 }}>
+                        {fo.name}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Photo grid */}
+          {isFolder && (
+            <div style={{ height:'100%', overflowY:'auto', background:'#fff', boxShadow:sunken }}>
+              {f.count === 0
+                ? <div style={{ padding:20, fontSize:13, color:'#808080' }}>No photos yet. Add images to <code>/gallery/{f.id}/</code> named 1.png, 2.png, etc., then update the count in GALLERY_FOLDERS.</div>
+                : (
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', alignContent:'flex-start', gap:10, padding:12 }}>
+                    {photos.map((ph,i)=>(
+                      <div key={i}
+                        onClick={()=>setSel(i)}
+                        onDoubleClick={()=>go({view:'viewer',folderId:loc.folderId,vi:i,sel:i})}
+                        style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:5, padding:'7px 5px', cursor:'default', userSelect:'none' }}>
+                        <div style={{ position:'relative', width:'100%' }}>
+                          <div style={{ padding:3, background:'#fff', boxShadow:sunken }}>
+                            <img src={ph.src} alt="" style={{ display:'block', width:'100%', aspectRatio:'4/3', objectFit:'cover' }} onError={e=>{ e.target.style.opacity='0.3'; }}/>
+                          </div>
+                          {ph.sel && <div style={{ position:'absolute', inset:0, border:'2px solid #000080', pointerEvents:'none' }}/>}
+                        </div>
+                        <div style={{ fontSize:12, textAlign:'center', padding:'1px 4px', background:ph.sel?'#000080':'transparent', color:ph.sel?'#fff':'#000', maxWidth:'100%', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                          {ph.cap}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              }
+            </div>
+          )}
+
+          {/* Viewer */}
+          {isViewer && cur && (
+            <div style={{ height:'100%', overflow:'auto', background:'#808080', boxShadow:'inset 1px 1px 0 #404040,inset -1px -1px 0 #fff', display:'flex', alignItems:'center', justifyContent:'center', padding:12 }}>
+              <img src={cur.src} alt="" style={{ display:'block', border:'5px solid #fff', boxShadow:'3px 3px 10px rgba(0,0,0,.55)', maxWidth:'calc(100% - 24px)', maxHeight:'calc(100% - 24px)', objectFit:'contain', transform:`scale(${st.zoom}) rotate(${st.rot}deg)`, transition:'transform 0.08s ease' }} onError={e=>{ e.target.alt='Image not found'; }}/>
+            </div>
+          )}
+
+        </div>
+      </div>
+
+      {/* Status bar */}
+      <div style={{ flexShrink:0, display:'flex', gap:3, padding:'1px 2px 2px' }}>
+        {[[null,statusLeft],[150,statusMid],[110,statusRight]].map(([w,txt],i)=>(
+          <div key={i} style={{ flex:w?0:1, width:w||undefined, padding:'2px 8px', fontSize:12, boxShadow:'inset 1px 1px 0 #808080,inset -1px -1px 0 #fff', display:'flex', alignItems:'center' }}>{txt}</div>
+        ))}
+      </div>
+
+    </div>
+  );
+}
+
 const BODIES = {
   welcome:   <WelcomeBody />,
   about:     <AboutBody />,
@@ -964,6 +1227,7 @@ const BODIES = {
   bank:      <BankBody />,
   resume:    <ResumeBody />,
   updatelog: <UpdateLogBody />,
+  gallery:   <GalleryBody />,
   sapling:   <SaplingAd />,
   mario:     <MarioAd />,
   stalk:     <StalkAd />,
@@ -977,6 +1241,7 @@ export default function App() {
     return {
       welcome:   { open: true,  min: false, max: false, x: wx,      y: wy,      z: 10, prev: null },
       updatelog: { open: true,  min: false, max: false, x: Math.max(8, window.innerWidth - 330), y: 8, z: 9, prev: null },
+      gallery:   { open: false, min: false, max: false, x: 120,      y: 60,      z: 1,  prev: null },
       about:     { open: false, min: false, max: false, x: 140,      y: 70,      z: 1,  prev: null },
       projects:  { open: false, min: false, max: false, x: 200,      y: 90,      z: 1,  prev: null },
       bank:      { open: false, min: false, max: false, x: 320,      y: 160,     z: 1,  prev: null },
