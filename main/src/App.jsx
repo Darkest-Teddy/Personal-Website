@@ -286,20 +286,6 @@ const MINE_ICON_URI = "data:image/svg+xml," + encodeURIComponent(
   '</svg>'
 );
 
-function MsShockedFace() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 100 100"
-         style={{ display: 'block', imageRendering: 'pixelated' }}
-         shapeRendering="crispEdges">
-      <circle cx="50" cy="50" r="49" fill="#000"/>
-      <circle cx="50" cy="50" r="43" fill="#ffff00"/>
-      <rect x="21" y="28" width="18" height="18" fill="#000"/>
-      <rect x="61" y="28" width="18" height="18" fill="#000"/>
-      <circle cx="50" cy="70" r="13" fill="#000"/>
-    </svg>
-  );
-}
-
 const MS_LEVELS = {
   beginner:     { rows: 9,  cols: 9,  mines: 10 },
   intermediate: { rows: 16, cols: 16, mines: 40 },
@@ -1433,7 +1419,7 @@ function MinesweeperBody() {
   const [gameState, setGameState] = useState('idle');
   const [flagCount, setFlagCount] = useState(0);
   const [time, setTime] = useState(0);
-  const [mouseHeld, setMouseHeld] = useState(false);
+  const [pressedCell, setPressedCell] = useState(null);
   const [menuOpen, setMenuOpen] = useState(null);
   const timerRef = useRef(null);
 
@@ -1528,7 +1514,7 @@ function MinesweeperBody() {
     setCells(g);
   };
 
-  const smileyState = gameState === 'won' ? 'cool' : gameState === 'lost' ? 'dead' : mouseHeld ? 'shocked' : 'normal';
+  const smileyState = gameState === 'won' ? 'cool' : gameState === 'lost' ? 'dead' : pressedCell !== null ? 'shocked' : 'normal';
   const CELL = 16;
 
   const renderCell = (cell, r, c) => {
@@ -1568,13 +1554,15 @@ function MinesweeperBody() {
       );
     }
 
+    const isPressed = pressedCell && pressedCell.r === r && pressedCell.c === c;
+    const pressedStyle = { ...base, border: '1px solid #808080', background: '#c0c0c0' };
     return (
-      <div key={key} style={raised}
+      <div key={key} style={isPressed ? pressedStyle : raised}
         onClick={() => handleClick(r, c)}
         onContextMenu={e => handleRightClick(e, r, c)}
-        onMouseDown={() => setMouseHeld(true)}
-        onMouseUp={() => setMouseHeld(false)}
-        onMouseLeave={() => setMouseHeld(false)}
+        onMouseDown={() => setPressedCell({ r, c })}
+        onMouseUp={() => setPressedCell(null)}
+        onMouseLeave={() => setPressedCell(null)}
       />
     );
   };
@@ -1636,10 +1624,7 @@ function MinesweeperBody() {
               onMouseDown={e => { e.currentTarget.style.borderColor = '#808080 #fff #fff #808080'; }}
               onMouseUp={e => { e.currentTarget.style.borderColor = '#fff #808080 #808080 #fff'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = '#fff #808080 #808080 #fff'; }}>
-              {smileyState === 'shocked'
-                ? <MsShockedFace />
-                : <img src={smileyState === 'dead' ? '/assets/minesweeper/Minesweeper - Lost.png' : smileyState === 'cool' ? '/assets/minesweeper/Minesweeper - Won.png' : '/assets/minesweeper/Minesweeper - Idle.png'} alt="" style={{ width: 24, height: 24, imageRendering: 'pixelated' }} />
-              }
+              <img src={{ dead: '/assets/minesweeper/Minesweeper - Lost.png', cool: '/assets/minesweeper/Minesweeper - Won.png', shocked: '/assets/minesweeper/Minesweeper - Shocked.png' }[smileyState] ?? '/assets/minesweeper/Minesweeper - Idle.png'} alt="" style={{ width: 24, height: 24, imageRendering: 'pixelated' }} />
             </button>
             <LcdPanel value={time} digits={3} />
           </div>
