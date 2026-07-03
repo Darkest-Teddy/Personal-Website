@@ -457,7 +457,7 @@ function EmailIconNode() {
   );
 }
 
-const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY;
+const WEB3FORMS_KEY = 'e575da3e-474f-4a44-bbee-0dcf9e7b27d1';
 
 /* ── App registry ── */
 const APPS = {
