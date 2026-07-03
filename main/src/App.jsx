@@ -169,7 +169,7 @@ const TickSpan = styled.span`
 
 const IconGrid = styled.div`
   position: absolute; top: 12px; left: 10px;
-  display: grid; grid-template-rows: repeat(4, auto);
+  display: grid; grid-template-rows: repeat(5, auto);
   grid-auto-flow: column; row-gap: 18px; column-gap: 2px;
 `;
 
@@ -274,6 +274,191 @@ function BookIcon() {
   return <img src="/book-icon.png" alt="" />;
 }
 
+/* ── Minesweeper helpers + sprites ── */
+const MINE_ICON_URI = "data:image/svg+xml," + encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">' +
+  '<rect x="0" y="7" width="16" height="2" fill="#000"/>' +
+  '<rect x="7" y="0" width="2" height="16" fill="#000"/>' +
+  '<line x1="3" y1="3" x2="13" y2="13" stroke="#000" stroke-width="2.2" stroke-linecap="round"/>' +
+  '<line x1="13" y1="3" x2="3" y2="13" stroke="#000" stroke-width="2.2" stroke-linecap="round"/>' +
+  '<circle cx="8" cy="8" r="5" fill="#000"/>' +
+  '<circle cx="5.5" cy="5.5" r="1.5" fill="#fff"/>' +
+  '</svg>'
+);
+
+const MS_LEVELS = {
+  beginner:     { rows: 9,  cols: 9,  mines: 10 },
+  intermediate: { rows: 16, cols: 16, mines: 40 },
+  expert:       { rows: 16, cols: 30, mines: 99 },
+};
+const MS_NUM_COLOR = ['', '#0000ff', '#007b00', '#ff0000', '#00007b', '#7b0000', '#007b7b', '#000', '#7b7b7b'];
+
+function msCreateGrid(rows, cols) {
+  return Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => ({ mine: false, state: 'hidden', adj: 0 }))
+  );
+}
+
+function msPlaceMines(cells, rows, cols, count, safeR, safeC) {
+  const safe = new Set();
+  for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+    const nr = safeR + dr, nc = safeC + dc;
+    if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) safe.add(nr * cols + nc);
+  }
+  const g = cells.map(row => row.map(c => ({ ...c })));
+  let placed = 0;
+  while (placed < count) {
+    const r = Math.floor(Math.random() * rows), c = Math.floor(Math.random() * cols);
+    if (!g[r][c].mine && !safe.has(r * cols + c)) { g[r][c].mine = true; placed++; }
+  }
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    if (g[r][c].mine) continue;
+    let adj = 0;
+    for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+      const nr = r + dr, nc = c + dc;
+      if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && g[nr][nc].mine) adj++;
+    }
+    g[r][c].adj = adj;
+  }
+  return g;
+}
+
+function msReveal(cells, startR, startC, rows, cols) {
+  const g = cells.map(row => row.map(c => ({ ...c })));
+  const stack = [[startR, startC]];
+  while (stack.length) {
+    const [r, c] = stack.pop();
+    if (r < 0 || r >= rows || c < 0 || c >= cols) continue;
+    if (g[r][c].state !== 'hidden') continue;
+    g[r][c].state = 'revealed';
+    if (!g[r][c].mine && g[r][c].adj === 0)
+      for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) stack.push([r + dr, c + dc]);
+  }
+  return g;
+}
+
+function msCheckWon(cells, rows, cols) {
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++)
+    if (!cells[r][c].mine && cells[r][c].state !== 'revealed') return false;
+  return true;
+}
+
+function MsMine({ size = 14 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" style={{ display: 'block', flexShrink: 0, imageRendering: 'pixelated' }} shapeRendering="crispEdges">
+      <rect x="0" y="6" width="14" height="2" fill="#000"/>
+      <rect x="6" y="0" width="2" height="14" fill="#000"/>
+      <line x1="2.5" y1="2.5" x2="11.5" y2="11.5" stroke="#000" strokeWidth="2" strokeLinecap="round"/>
+      <line x1="11.5" y1="2.5" x2="2.5" y2="11.5" stroke="#000" strokeWidth="2" strokeLinecap="round"/>
+      <circle cx="7" cy="7" r="4.5" fill="#000"/>
+      <circle cx="5.5" cy="5" r="1.3" fill="#fff"/>
+    </svg>
+  );
+}
+
+function MsFlag({ size = 14 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" style={{ display: 'block', flexShrink: 0, imageRendering: 'pixelated' }} shapeRendering="crispEdges">
+      {/* Pole */}
+      <rect x="5" y="0" width="1" height="12" fill="#000"/>
+      {/* Red flag — stepped right-pointing triangle */}
+      <rect x="6" y="0" width="5" height="1" fill="#f00"/>
+      <rect x="6" y="1" width="4" height="1" fill="#f00"/>
+      <rect x="6" y="2" width="3" height="1" fill="#f00"/>
+      <rect x="6" y="3" width="2" height="1" fill="#f00"/>
+      <rect x="6" y="4" width="1" height="1" fill="#f00"/>
+      {/* Base */}
+      <rect x="3" y="12" width="5" height="1" fill="#000"/>
+      <rect x="2" y="13" width="7" height="1" fill="#000"/>
+    </svg>
+  );
+}
+
+function MsSmiley({ state = 'normal', size = 24 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" style={{ display: 'block' }}>
+      <circle cx="12" cy="12" r="10.5" fill="#ffff00" stroke="#000" strokeWidth="1.5"/>
+      {state === 'normal' && <>
+        <rect x="7" y="8" width="3" height="3" fill="#000"/>
+        <rect x="14" y="8" width="3" height="3" fill="#000"/>
+        <path d="M7 16 Q9.5 19.5 12 19.5 Q14.5 19.5 17 16" stroke="#000" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+      </>}
+      {state === 'shocked' && <>
+        <rect x="7" y="8" width="3" height="3" fill="#000"/>
+        <rect x="14" y="8" width="3" height="3" fill="#000"/>
+        <ellipse cx="12" cy="17" rx="2.5" ry="2.5" fill="#000"/>
+      </>}
+      {state === 'dead' && <>
+        <path d="M7 8 L10 11 M10 8 L7 11" stroke="#000" strokeWidth="1.8" strokeLinecap="round"/>
+        <path d="M14 8 L17 11 M17 8 L14 11" stroke="#000" strokeWidth="1.8" strokeLinecap="round"/>
+        <path d="M7 18 Q9.5 15.5 12 15.5 Q14.5 15.5 17 18" stroke="#000" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+      </>}
+      {state === 'cool' && <>
+        <rect x="4" y="8" width="6" height="4" rx="1.5" fill="#000"/>
+        <rect x="14" y="8" width="6" height="4" rx="1.5" fill="#000"/>
+        <rect x="10" y="9" width="4" height="2" fill="#000"/>
+        <path d="M7 16 Q9.5 19.5 12 19.5 Q14.5 19.5 17 16" stroke="#000" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+      </>}
+    </svg>
+  );
+}
+
+const LCD_SEG_DATA = [
+  [1,1,1,1,1,1,0],[0,1,1,0,0,0,0],[1,1,0,1,1,0,1],[1,1,1,1,0,0,1],
+  [0,1,1,0,0,1,1],[1,0,1,1,0,1,1],[1,0,1,1,1,1,1],[1,1,1,0,0,0,0],
+  [1,1,1,1,1,1,1],[1,1,1,1,0,1,1],
+];
+
+function LcdDigit({ n }) {
+  const s = LCD_SEG_DATA[Math.max(0, Math.min(9, n))] || LCD_SEG_DATA[0];
+  const ON = '#ff2200', OFF = '#3a0000';
+  const W = 11, H = 21, T = 2, SP = 0.5;
+  return (
+    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
+      <polygon points={`${T},0 ${W-T},0 ${W-T-SP},${T} ${T+SP},${T}`} fill={s[0] ? ON : OFF}/>
+      <polygon points={`${W},${T} ${W},${H/2-SP} ${W-T},${H/2-T} ${W-T},${T+SP}`} fill={s[1] ? ON : OFF}/>
+      <polygon points={`${W},${H/2+SP} ${W},${H-T} ${W-T},${H-T-SP} ${W-T},${H/2+T}`} fill={s[2] ? ON : OFF}/>
+      <polygon points={`${T+SP},${H-T} ${W-T-SP},${H-T} ${W-T},${H} ${T},${H}`} fill={s[3] ? ON : OFF}/>
+      <polygon points={`0,${H/2+SP} ${T},${H/2+T} ${T},${H-T-SP} 0,${H-T}`} fill={s[4] ? ON : OFF}/>
+      <polygon points={`0,${T} ${T},${T+SP} ${T},${H/2-T} 0,${H/2-SP}`} fill={s[5] ? ON : OFF}/>
+      <polygon points={`${T+SP},${H/2} ${W-T-SP},${H/2} ${W-T},${H/2+T/2} ${W-T-SP},${H/2+T} ${T+SP},${H/2+T} ${T},${H/2+T/2}`} fill={s[6] ? ON : OFF}/>
+    </svg>
+  );
+}
+
+function LcdPanel({ value, digits = 3 }) {
+  const v = Math.max(-99, Math.min(999, Math.floor(value)));
+  const neg = v < 0;
+  const abs = Math.abs(v);
+  const numStr = String(abs).padStart(neg ? digits - 1 : digits, '0');
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 1, background: '#000', padding: '2px 4px',
+      boxShadow: 'inset 1px 1px 0 #808080,inset -1px -1px 0 #fff,inset 2px 2px 0 #404040,inset -2px -2px 0 #dfdfdf' }}>
+      {neg && (
+        <svg width={11} height={21} viewBox="0 0 11 21" style={{ display: 'block' }}>
+          <polygon points="2,10 9,10 9,13 2,13" fill="#ff2200"/>
+        </svg>
+      )}
+      {numStr.split('').map((ch, i) => <LcdDigit key={i} n={parseInt(ch)} />)}
+    </div>
+  );
+}
+
+function MineIconNode() { return <img src="/Minesweeper - 16.png" alt="" style={{ imageRendering: 'pixelated', width: 12, height: 12 }} />; }
+
+function EmailIconNode() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" style={{ display: 'block', imageRendering: 'pixelated' }} shapeRendering="crispEdges">
+      <rect x="1" y="3" width="14" height="10" fill="#fff" stroke="#000" strokeWidth="1"/>
+      <polyline points="1,3 8,9 15,3" stroke="#000" strokeWidth="1" fill="none"/>
+      <line x1="1" y1="13" x2="6" y2="8.5" stroke="#808080" strokeWidth="1"/>
+      <line x1="15" y1="13" x2="10" y2="8.5" stroke="#808080" strokeWidth="1"/>
+    </svg>
+  );
+}
+
+const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY;
+
 /* ── App registry ── */
 const APPS = {
   welcome:  { title: "Welcome",    icon: "/welcome.png", width: 300, pixel: true },
@@ -284,7 +469,9 @@ const APPS = {
   linkedin: { title: "LinkedIn",   icon: "/linkedin.png", link: "https://www.linkedin.com/in/jacklhe/",       pixel: true, bottom: true },
   bank:     { title: "RUNDLL",     icon: "/money.png",    width: 420, sound: true },
   updatelog: { title: "UpdateLog", iconNode: <BookIcon />, icon: "/projects.png", width: 320, height: 460, noDesktop: true },
-  gallery:   { title: "Photo Gallery", icon: "/icon-camera.png", width: 760, height: 560, pixel: true },
+  gallery:       { title: "Photo Gallery",  icon: "/icon-camera.png", width: 760, height: 560, pixel: true },
+  minesweeper:   { title: "Minesweeper",    iconNode: <MineIconNode />, icon: "/Minesweeper Logo.png", width: 310, height: 400, gridRow: 5, gridColumn: 1, iconSize: 50 },
+  email:         { title: "Send Mail",     iconNode: <EmailIconNode />, icon: "/Email.png", width: 500, height: 420 },
   sapling: {
     title: "Sapling", iconNode: <SaplingIcon />, icon: "/sapling-icon.svg", width: 256,
     titlebarBg: "linear-gradient(180deg,#39a552,#1f7a33)", titlebarColor: "#fff",
@@ -310,7 +497,7 @@ const PROJECTS = [
 const TASKBAR_H = 32;
 const MIN_W = 200;
 const MIN_H = 120;
-const BODY_PAD = { welcome: 12, about: 0, projects: 0, bank: 0, resume: 0, updatelog: 0, gallery: 0, sapling: 0, mario: 0, stalk: 0 };
+const BODY_PAD = { welcome: 12, about: 0, projects: 0, bank: 0, resume: 0, updatelog: 0, gallery: 0, minesweeper: 0, email: 0, sapling: 0, mario: 0, stalk: 0 };
 
 function randomPosition(width, height) {
   const maxX = Math.max(8, window.innerWidth  - width  - 8);
@@ -421,7 +608,7 @@ function Win95Window({ id, win, active, onFocus, onClose, onMin, onMax, onMove, 
 
       <WindowContent style={{
         flex: 1, minHeight: 0,
-        overflow: isProject ? "visible" : id === "resume" ? "hidden" : "auto",
+        overflow: isProject ? "visible" : (id === "resume" || id === "minesweeper" || id === "email") ? "hidden" : "auto",
         padding: BODY_PAD[id],
         textAlign: id === "welcome" ? "center" : undefined,
         marginBottom: (win.max || isProject) ? 0 : 12,
@@ -1226,17 +1413,375 @@ function GalleryBody() {
   );
 }
 
+function MinesweeperBody() {
+  const [level, setLevel] = useState('intermediate');
+  const [cells, setCells] = useState(() => msCreateGrid(16, 16));
+  const [gameState, setGameState] = useState('idle');
+  const [flagCount, setFlagCount] = useState(0);
+  const [time, setTime] = useState(0);
+  const [mouseHeld, setMouseHeld] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(null);
+  const timerRef = useRef(null);
+
+  const { rows, cols, mines } = MS_LEVELS[level];
+
+  const doReset = useCallback((lv) => {
+    const newLv = lv || level;
+    clearInterval(timerRef.current);
+    const lvl = MS_LEVELS[newLv];
+    setCells(msCreateGrid(lvl.rows, lvl.cols));
+    setGameState('idle');
+    setFlagCount(0);
+    setTime(0);
+    if (lv) setLevel(lv);
+  }, [level]);
+
+  useEffect(() => () => clearInterval(timerRef.current), []);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handler = () => setMenuOpen(null);
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [menuOpen]);
+
+  const handleClick = (r, c) => {
+    if (gameState === 'won' || gameState === 'lost') return;
+    const cell = cells[r][c];
+    if (cell.state === 'flagged' || cell.state === 'question') return;
+
+    if (cell.state === 'revealed') {
+      if (cell.adj === 0) return;
+      let adjFlags = 0;
+      for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+        const nr = r + dr, nc = c + dc;
+        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && cells[nr][nc].state === 'flagged') adjFlags++;
+      }
+      if (adjFlags !== cell.adj) return;
+      let g = cells.map(row => row.map(c => ({ ...c })));
+      let hitMine = false;
+      for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+        const nr = r + dr, nc = c + dc;
+        if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
+        if (g[nr][nc].state === 'hidden') {
+          if (g[nr][nc].mine) { g[nr][nc].state = 'revealed'; hitMine = true; }
+          else g = msReveal(g, nr, nc, rows, cols);
+        }
+      }
+      if (hitMine) {
+        g = g.map(row => row.map(c => c.mine && c.state !== 'flagged' ? { ...c, state: 'revealed' } : { ...c }));
+        clearInterval(timerRef.current);
+        setCells(g); setGameState('lost'); return;
+      }
+      if (msCheckWon(g, rows, cols)) {
+        clearInterval(timerRef.current);
+        setCells(g.map(row => row.map(c => c.mine ? { ...c, state: 'flagged' } : { ...c })));
+        setFlagCount(mines); setGameState('won'); return;
+      }
+      setCells(g); return;
+    }
+
+    let g = cells;
+    if (gameState === 'idle') {
+      g = msPlaceMines(cells, rows, cols, mines, r, c);
+      setGameState('playing');
+      clearInterval(timerRef.current);
+      timerRef.current = setInterval(() => setTime(t => Math.min(999, t + 1)), 1000);
+    }
+    if (g[r][c].mine) {
+      g = g.map(row => row.map(c => c.mine && c.state !== 'flagged' ? { ...c, state: 'revealed' } : { ...c }));
+      clearInterval(timerRef.current);
+      setCells(g); setGameState('lost'); return;
+    }
+    g = msReveal(g, r, c, rows, cols);
+    if (msCheckWon(g, rows, cols)) {
+      clearInterval(timerRef.current);
+      setCells(g.map(row => row.map(c => c.mine ? { ...c, state: 'flagged' } : { ...c })));
+      setFlagCount(mines); setGameState('won'); return;
+    }
+    setCells(g);
+  };
+
+  const handleRightClick = (e, r, c) => {
+    e.preventDefault();
+    if (gameState === 'won' || gameState === 'lost') return;
+    if (cells[r][c].state === 'revealed') return;
+    const g = cells.map(row => row.map(c => ({ ...c })));
+    const cur = g[r][c].state;
+    if (cur === 'hidden') { g[r][c].state = 'flagged'; setFlagCount(f => f + 1); }
+    else if (cur === 'flagged') { g[r][c].state = 'question'; setFlagCount(f => f - 1); }
+    else { g[r][c].state = 'hidden'; }
+    setCells(g);
+  };
+
+  const smileyState = gameState === 'won' ? 'cool' : gameState === 'lost' ? 'dead' : mouseHeld ? 'shocked' : 'normal';
+  const CELL = 16;
+
+  const renderCell = (cell, r, c) => {
+    const { state, mine, adj } = cell;
+    const key = `${r}-${c}`;
+    const base = { width: CELL, height: CELL, boxSizing: 'border-box', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' };
+
+    if (state === 'revealed') {
+      return (
+        <div key={key} style={{ ...base, border: '1px solid #808080', background: mine ? '#f00' : '#c0c0c0', fontSize: 13, fontWeight: 'bold', color: MS_NUM_COLOR[adj] || '#000', fontFamily: "'W95FA', sans-serif", userSelect: 'none' }}
+          onClick={() => handleClick(r, c)}>
+          {mine ? <MsMine size={12} /> : adj > 0 ? adj : null}
+        </div>
+      );
+    }
+
+    const raised = { ...base, border: '2px solid', borderColor: '#fff #808080 #808080 #fff', background: '#c0c0c0', cursor: 'default' };
+
+    if (state === 'flagged') {
+      const wrongFlag = gameState === 'lost' && !mine;
+      return (
+        <div key={key} style={raised} onContextMenu={e => handleRightClick(e, r, c)}>
+          {wrongFlag
+            ? <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <MsMine size={12} />
+                <div style={{ position: 'absolute', fontSize: 13, color: '#f00', fontWeight: 'bold', pointerEvents: 'none' }}>✕</div>
+              </div>
+            : <MsFlag size={12} />}
+        </div>
+      );
+    }
+
+    if (state === 'question') {
+      return (
+        <div key={key} style={{ ...raised, fontSize: 12, fontWeight: 'bold', color: '#000', userSelect: 'none' }}
+          onClick={() => handleClick(r, c)} onContextMenu={e => handleRightClick(e, r, c)}>?</div>
+      );
+    }
+
+    return (
+      <div key={key} style={raised}
+        onClick={() => handleClick(r, c)}
+        onContextMenu={e => handleRightClick(e, r, c)}
+        onMouseDown={() => setMouseHeld(true)}
+        onMouseUp={() => setMouseHeld(false)}
+        onMouseLeave={() => setMouseHeld(false)}
+      />
+    );
+  };
+
+  const outerBorder = { border: '3px solid', borderColor: '#808080 #fff #fff #808080', boxShadow: 'inset 1px 1px 0 #404040' };
+
+  const menuItems = [
+    { label: 'New Game', shortcut: 'F2', action: () => doReset() },
+    null,
+    { label: 'Beginner',     action: () => doReset('beginner'),     check: level === 'beginner' },
+    { label: 'Intermediate', action: () => doReset('intermediate'), check: level === 'intermediate' },
+    { label: 'Expert',       action: () => doReset('expert'),       check: level === 'expert' },
+  ];
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: '#c0c0c0', userSelect: 'none' }}
+      onContextMenu={e => e.preventDefault()}>
+
+      {/* Menu bar */}
+      <div style={{ height: 20, flexShrink: 0, display: 'flex', alignItems: 'center', padding: '2px 2px 0', fontSize: 13, cursor: 'default' }}>
+        {['Game', 'Help', 'Extras'].map(m => (
+          <div key={m} style={{ position: 'relative' }} onMouseDown={e => e.stopPropagation()}>
+            <span style={{ padding: '1px 7px', display: 'block' }}
+              onMouseDown={() => setMenuOpen(p => p === m ? null : m)}
+              onMouseEnter={e => { e.currentTarget.style.background = '#000080'; e.currentTarget.style.color = '#fff'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#000'; }}>
+              <span style={{ textDecoration: 'underline' }}>{m[0]}</span>{m.slice(1)}
+            </span>
+            {menuOpen === m && m === 'Game' && (
+              <div style={{ position: 'absolute', top: '100%', left: 0, background: '#c0c0c0', border: '2px solid', borderColor: '#fff #404040 #404040 #fff', boxShadow: '2px 2px 4px rgba(0,0,0,.35)', zIndex: 999, minWidth: 170, padding: '2px 0' }}>
+                {menuItems.map((item, i) => item === null
+                  ? <div key={i} style={{ height: 1, background: '#808080', margin: '3px 4px' }} />
+                  : (
+                    <div key={i} style={{ padding: '3px 24px 3px 24px', fontSize: 13, color: '#000', display: 'flex', alignItems: 'center', cursor: 'default', position: 'relative' }}
+                      onMouseEnter={e => { e.currentTarget.style.background = '#000080'; e.currentTarget.style.color = '#fff'; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#000'; }}
+                      onMouseDown={() => { item.action(); setMenuOpen(null); }}>
+                      {item.check && <span style={{ position: 'absolute', left: 8 }}>•</span>}
+                      {item.label}
+                      {item.shortcut && <span style={{ marginLeft: 'auto', paddingLeft: 16, opacity: 0.65 }}>{item.shortcut}</span>}
+                    </div>
+                  )
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Game area */}
+      <div style={{ flex: 1, overflow: 'hidden', padding: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ display: 'inline-flex', flexDirection: 'column', gap: 6, ...outerBorder, padding: 6, background: '#c0c0c0' }}>
+
+          {/* Header: counter | smiley | timer */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 6px', ...outerBorder, minWidth: cols * CELL - 12 }}>
+            <LcdPanel value={mines - flagCount} digits={3} />
+            <button onClick={() => doReset()}
+              style={{ width: 30, height: 30, background: '#c0c0c0', border: '2px solid', borderColor: '#fff #808080 #808080 #fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, outline: 'none' }}
+              onMouseDown={e => { e.currentTarget.style.borderColor = '#808080 #fff #fff #808080'; }}
+              onMouseUp={e => { e.currentTarget.style.borderColor = '#fff #808080 #808080 #fff'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#fff #808080 #808080 #fff'; }}>
+              <img src={smileyState === 'dead' ? '/Minesweeper - Lost.png' : smileyState === 'cool' ? '/Minesweeper - Won.png' : '/Minesweeper - Idle.png'} alt="" style={{ width: 24, height: 24, imageRendering: 'pixelated' }} />
+            </button>
+            <LcdPanel value={time} digits={3} />
+          </div>
+
+          {/* Grid */}
+          <div style={{ ...outerBorder, display: 'inline-block', lineHeight: 0 }}>
+            {cells.map((row, r) => (
+              <div key={r} style={{ display: 'flex' }}>
+                {row.map((cell, c) => renderCell(cell, r, c))}
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EmailBody() {
+  const [form, setForm] = useState({ from: '', subject: '', message: '' });
+  const [status, setStatus] = useState('idle');
+
+  const sunken = "inset 1px 1px 0 #808080, inset -1px -1px 0 #fff, inset 2px 2px 0 #404040, inset -2px -2px 0 #dfdfdf";
+
+  const handleSend = async (e) => {
+    if (e?.preventDefault) e.preventDefault();
+    if (!form.from.trim() || !form.subject.trim() || !form.message.trim()) {
+      setStatus('incomplete'); return;
+    }
+    setStatus('sending');
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_KEY,
+          subject: form.subject,
+          from_name: 'Portfolio Contact',
+          email: form.from,
+          message: form.message,
+        }),
+      });
+      setStatus(res.ok ? 'sent' : 'error');
+    } catch { setStatus('error'); }
+  };
+
+  const inputStyle = {
+    flex: 1, boxSizing: 'border-box', background: '#fff', border: 'none', outline: 'none',
+    padding: '2px 4px', fontFamily: "'W95FA', sans-serif", fontSize: 13, height: 22,
+    boxShadow: sunken, userSelect: 'text',
+  };
+
+  const W95Btn = ({ onClick, children, disabled }) => (
+    <button onClick={onClick} disabled={!!disabled} style={{
+      height: 22, background: '#c0c0c0',
+      border: '2px solid', borderColor: '#fff #808080 #808080 #fff',
+      boxShadow: 'inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #404040',
+      fontFamily: "'W95FA', sans-serif", fontSize: 13,
+      cursor: disabled ? 'default' : 'pointer', outline: 'none', padding: '0 6px',
+      display: 'flex', alignItems: 'center', gap: 4,
+    }}
+      onMouseDown={e => { if (!disabled) e.currentTarget.style.borderColor = '#808080 #fff #fff #808080'; }}
+      onMouseUp={e => { if (!disabled) e.currentTarget.style.borderColor = '#fff #808080 #808080 #fff'; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = '#fff #808080 #808080 #fff'; }}
+    >{children}</button>
+  );
+
+  if (status === 'sent') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 14, fontFamily: "'W95FA', sans-serif", fontSize: 13, background: '#c0c0c0' }}>
+        <img src="/Email.png" alt="" style={{ width: 48, height: 48, imageRendering: 'pixelated', objectFit: 'contain' }} />
+        <p style={{ margin: 0 }}>Message sent!</p>
+        <W95Btn onClick={() => { setForm({ from: '', subject: '', message: '' }); setStatus('idle'); }}>New Message</W95Btn>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#c0c0c0', fontFamily: "'W95FA', sans-serif", fontSize: 13, userSelect: 'none' }}>
+      {/* Menu bar */}
+      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', padding: '2px 4px', borderBottom: '1px solid #808080' }}>
+        {['File', 'Edit', 'View', 'Insert', 'Format', 'Help'].map(m => (
+          <span key={m} style={{ padding: '1px 6px', fontSize: 13, cursor: 'default' }}
+            onMouseEnter={e => { e.currentTarget.style.background = '#000080'; e.currentTarget.style.color = '#fff'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#000'; }}>
+            <u>{m[0]}</u>{m.slice(1)}
+          </span>
+        ))}
+      </div>
+
+      {/* Header fields */}
+      <div style={{ flexShrink: 0, padding: '5px 8px 3px', borderBottom: '1px solid #808080' }}>
+        {/* To row with Send button */}
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+          <span style={{ width: 56, flexShrink: 0, textAlign: 'right', paddingRight: 6, userSelect: 'none' }}>To:</span>
+          <input readOnly value="jackhe@bu.edu" style={{ ...inputStyle, background: '#c0c0c0', userSelect: 'none', flex: 1 }} />
+          <div style={{ marginLeft: 6, flexShrink: 0 }}>
+            <W95Btn onClick={handleSend} disabled={status === 'sending'}>
+              <img src="/send.svg" alt="" style={{ width: 14, height: 14, objectFit: 'contain', display: 'block' }} />
+              Send
+            </W95Btn>
+          </div>
+        </div>
+        {[
+          { label: 'From:',    field: 'from',    placeholder: 'your@email.com' },
+          { label: 'Subject:', field: 'subject', placeholder: 'Enter subject' },
+        ].map(({ label, field, placeholder }) => (
+          <div key={label} style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+            <span style={{ width: 56, flexShrink: 0, textAlign: 'right', paddingRight: 6, userSelect: 'none' }}>{label}</span>
+            <input
+              type={field === 'from' ? 'email' : 'text'}
+              value={form[field]}
+              placeholder={placeholder}
+              onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
+              style={{ ...inputStyle }}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Message */}
+      <textarea
+        value={form.message}
+        onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
+        placeholder="Type your message here..."
+        style={{
+          flex: 1, resize: 'none', border: 'none', outline: 'none',
+          padding: '6px 8px', fontFamily: "'W95FA', sans-serif", fontSize: 13,
+          background: '#fff', userSelect: 'text',
+          boxShadow: 'inset 1px 1px 0 #808080, inset 2px 2px 0 #404040',
+        }}
+      />
+
+      {/* Status — only shown when actionable */}
+      {(status === 'sending' || status === 'error' || status === 'incomplete') && (
+        <div style={{ flexShrink: 0, padding: '2px 8px', fontSize: 12, background: '#c0c0c0', borderTop: '1px solid #808080' }}>
+          {status === 'sending'    ? 'Sending...' :
+           status === 'error'      ? 'Error: could not send. Please try again.' :
+                                     'Please fill in all fields.'}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const BODIES = {
-  welcome:   <WelcomeBody />,
-  about:     <AboutBody />,
-  projects:  <ProjectsBody />,
-  bank:      <BankBody />,
-  resume:    <ResumeBody />,
-  updatelog: <UpdateLogBody />,
-  gallery:   <GalleryBody />,
-  sapling:   <SaplingAd />,
-  mario:     <MarioAd />,
-  stalk:     <StalkAd />,
+  welcome:     <WelcomeBody />,
+  about:       <AboutBody />,
+  projects:    <ProjectsBody />,
+  bank:        <BankBody />,
+  resume:      <ResumeBody />,
+  updatelog:   <UpdateLogBody />,
+  gallery:     <GalleryBody />,
+  minesweeper: <MinesweeperBody />,
+  email:       <EmailBody />,
+  sapling:     <SaplingAd />,
+  mario:       <MarioAd />,
+  stalk:       <StalkAd />,
 };
 
 /* ── App + window manager ── */
@@ -1247,8 +1792,10 @@ export default function App() {
     return {
       welcome:   { open: true,  min: false, max: false, x: wx,      y: wy,      z: 10, prev: null },
       updatelog: { open: true,  min: false, max: false, x: Math.max(8, window.innerWidth - 330), y: 8, z: 9, prev: null },
-      gallery:   { open: false, min: false, max: false, x: 120,      y: 60,      z: 1,  prev: null },
-      about:     { open: false, min: false, max: false, x: 140,      y: 70,      z: 1,  prev: null },
+      gallery:      { open: false, min: false, max: false, x: 120, y: 60,  z: 1, prev: null },
+      minesweeper:  { open: false, min: false, max: false, x: 180, y: 70,  z: 1, prev: null },
+      email:        { open: false, min: false, max: false, x: 200, y: 80,  z: 1, prev: null },
+      about:        { open: false, min: false, max: false, x: 140, y: 70,  z: 1, prev: null },
       projects:  { open: false, min: false, max: false, x: 200,      y: 90,      z: 1,  prev: null },
       bank:      { open: false, min: false, max: false, x: 320,      y: 160,     z: 1,  prev: null },
       resume:    { open: false, min: false, max: false, x: 180,      y: 60,      z: 1,  prev: null },
@@ -1367,7 +1914,7 @@ export default function App() {
                 $gridRow={app.gridRow}
                 $gridColumn={app.gridColumn}
               >
-                <img src={app.icon} alt="" style={{ imageRendering: app.pixel ? "pixelated" : "auto", objectFit: "contain" }} />
+                <img src={app.icon} alt="" style={{ imageRendering: app.pixel ? "pixelated" : "auto", objectFit: "contain", width: app.iconSize, height: app.iconSize }} />
                 <span>{id === "bank" ? "My Bank Account Information" : app.title}</span>
               </DesktopIcon>
             ))}
