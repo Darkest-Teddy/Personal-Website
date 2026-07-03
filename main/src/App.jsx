@@ -1648,6 +1648,8 @@ function EmailBody() {
 
   const sunken = "inset 1px 1px 0 #808080, inset -1px -1px 0 #fff, inset 2px 2px 0 #404040, inset -2px -2px 0 #dfdfdf";
 
+  const [errorMsg, setErrorMsg] = useState('');
+
   const handleSend = async (e) => {
     if (e?.preventDefault) e.preventDefault();
     if (!form.from.trim() || !form.subject.trim() || !form.message.trim()) {
@@ -1666,8 +1668,17 @@ function EmailBody() {
           message: form.message,
         }),
       });
-      setStatus(res.ok ? 'sent' : 'error');
-    } catch { setStatus('error'); }
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
+        setStatus('sent');
+      } else {
+        setErrorMsg(data.message || `HTTP ${res.status}`);
+        setStatus('error');
+      }
+    } catch (err) {
+      setErrorMsg(err.message || 'Network error');
+      setStatus('error');
+    }
   };
 
   const inputStyle = {
@@ -1761,7 +1772,7 @@ function EmailBody() {
       {(status === 'sending' || status === 'error' || status === 'incomplete') && (
         <div style={{ flexShrink: 0, padding: '2px 8px', fontSize: 12, background: '#c0c0c0', borderTop: '1px solid #808080' }}>
           {status === 'sending'    ? 'Sending...' :
-           status === 'error'      ? 'Error: could not send. Please try again.' :
+           status === 'error'      ? `Error: ${errorMsg || 'could not send'}` :
                                      'Please fill in all fields.'}
         </div>
       )}
