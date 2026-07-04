@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useContext, useMemo } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -481,6 +481,7 @@ const APPS = {
   gallery:       { title: "Photo Gallery",  icon: "/assets/gallery/icon-camera.png", width: 760, height: 560, pixel: true },
   minesweeper:   { title: "Minesweeper",    iconNode: <MineIconNode />, icon: "/assets/minesweeper/Minesweeper Logo.png", width: 310, height: 400, gridRow: 5, gridColumn: 1, iconSize: 50 },
   email:         { title: "Send Mail",     iconNode: <EmailIconNode />, icon: "/assets/email/Email.png", width: 500, height: 420 },
+  recyclebin:    { title: "Recycle Bin",   icon: "/assets/shared/recycle-bin.png", width: 400, height: 320, pixel: true },
   sapling: {
     title: "Sapling", iconNode: <SaplingIcon />, icon: "/assets/sapling/sapling-icon.svg", width: 256,
     titlebarBg: "linear-gradient(180deg,#39a552,#1f7a33)", titlebarColor: "#fff",
@@ -506,7 +507,7 @@ const PROJECTS = [
 const TASKBAR_H = 32;
 const MIN_W = 200;
 const MIN_H = 120;
-const BODY_PAD = { welcome: 12, about: 0, projects: 0, bank: 0, resume: 0, updatelog: 0, gallery: 0, minesweeper: 0, email: 0, sapling: 0, mario: 0, stalk: 0 };
+const BODY_PAD = { welcome: 12, about: 0, projects: 0, bank: 0, resume: 0, updatelog: 0, gallery: 0, minesweeper: 0, email: 0, recyclebin: 0, sapling: 0, mario: 0, stalk: 0 };
 
 function randomPosition(width, height) {
   const maxX = Math.max(8, window.innerWidth  - width  - 8);
@@ -527,10 +528,17 @@ function spawnPosition(width, height, placed) {
   return randomPosition(width, height);
 }
 
+/* When a window shows an app-modal dialog it registers its id here; the window
+   manager then greys that window's titlebar and blocks its title buttons until
+   the dialog is dismissed. */
+const ModalContext = React.createContext({ modalWin: null, setModalWin: () => {} });
+
 /* ── Draggable Win95 window ── */
 function Win95Window({ id, win, active, onFocus, onClose, onMin, onMax, onMove, onResize, children }) {
   const app = APPS[id];
   const isProject = PROJECT_IDS.includes(id);
+  const { modalWin } = useContext(ModalContext);
+  const blocked = modalWin === id;
   const dragging = useRef(null);
   const resizing = useRef(null);
   const winRef   = useRef(null);
@@ -539,7 +547,7 @@ function Win95Window({ id, win, active, onFocus, onClose, onMin, onMax, onMove, 
   const onHeaderMouseDown = e => {
     onFocus(id);
     if (e.target.closest("button")) return;
-    if (win.max) return;
+    if (win.max || blocked) return;
     dragging.current = { startX: e.clientX, startY: e.clientY, ox: win.x, oy: win.y };
     e.preventDefault();
   };
@@ -549,7 +557,7 @@ function Win95Window({ id, win, active, onFocus, onClose, onMin, onMax, onMove, 
     if (!handle) return;
     const down = e => {
       onFocus(id);
-      if (win.max) return;
+      if (win.max || blocked) return;
       const box = winRef.current;
       resizing.current = {
         startX: e.clientX, startY: e.clientY,
@@ -560,7 +568,7 @@ function Win95Window({ id, win, active, onFocus, onClose, onMin, onMax, onMove, 
     };
     handle.addEventListener("mousedown", down);
     return () => handle.removeEventListener("mousedown", down);
-  }, [id, win.max, win.w, win.h, app.width, app.height, onFocus]);
+  }, [id, win.max, win.w, win.h, app.width, app.height, onFocus, blocked]);
 
   useEffect(() => {
     const move = e => {
@@ -595,29 +603,29 @@ function Win95Window({ id, win, active, onFocus, onClose, onMin, onMax, onMove, 
       {id === "mario" && <GoombaWalker src="/assets/mario/goomba-walk.gif" alt="" />}
 
       <GradientHeader
-        active={active}
-        $active={active}
-        $activeBg={app.titlebarBg}
-        $inactiveBg={app.titlebarBg}
-        $activeColor={app.titlebarColor}
-        $inactiveColor={app.titlebarColor}
+        active={active && !blocked}
+        $active={active && !blocked}
+        $activeBg={blocked ? undefined : app.titlebarBg}
+        $inactiveBg={blocked ? undefined : app.titlebarBg}
+        $activeColor={blocked ? undefined : app.titlebarColor}
+        $inactiveColor={blocked ? undefined : app.titlebarColor}
         onMouseDown={onHeaderMouseDown}
-        onDoubleClick={() => !isProject && onMax(id)}
+        onDoubleClick={() => !isProject && !blocked && onMax(id)}
       >
         <TitleText>
           {app.iconNode ?? <img src={app.icon} alt="" />}
           {app.title}
         </TitleText>
         <TitleButtons>
-          {!isProject && <TitleBtn onClick={() => onMin(id)}><MinGlyph /></TitleBtn>}
-          {!isProject && <TitleBtn onClick={() => onMax(id)}><MaxGlyph /></TitleBtn>}
-          <TitleBtn onClick={() => onClose(id)}><CloseGlyph>✕</CloseGlyph></TitleBtn>
+          {!isProject && <TitleBtn onClick={() => !blocked && onMin(id)}><MinGlyph /></TitleBtn>}
+          {!isProject && <TitleBtn onClick={() => !blocked && onMax(id)}><MaxGlyph /></TitleBtn>}
+          <TitleBtn onClick={() => !blocked && onClose(id)}><CloseGlyph>✕</CloseGlyph></TitleBtn>
         </TitleButtons>
       </GradientHeader>
 
       <WindowContent style={{
         flex: 1, minHeight: 0,
-        overflow: isProject ? "visible" : (id === "resume" || id === "minesweeper" || id === "email") ? "hidden" : "auto",
+        overflow: isProject ? "visible" : (id === "resume" || id === "minesweeper" || id === "email" || id === "recyclebin") ? "hidden" : "auto",
         padding: BODY_PAD[id],
         textAlign: id === "welcome" ? "center" : undefined,
         marginBottom: (win.max || isProject) ? 0 : 12,
@@ -1816,6 +1824,111 @@ function EmailBody() {
   );
 }
 
+/* ── Recycle Bin ── */
+const RECYCLE_FILES = [
+  { name: "super secret files",         kb: 50,  icon: "/assets/recycle-bin/bloody-folder.png", note: "Nice try. This folder redacted itself the moment you clicked it." },
+  { name: "passwords.txt",              kb: 2,   icon: "/assets/recycle-bin/document.png",      note: "hunter2\n\n...just kidding. Go away." },
+  { name: "definitely_not_a_virus.exe", kb: 666, icon: "/assets/recycle-bin/self-destruct.png", note: "Windows protected your PC from this totally trustworthy program. You're welcome." },
+  { name: "my_browser_history.dat",     kb: 0,   icon: "/assets/recycle-bin/document.png",      note: "Conveniently empty. What history? I have no idea what you're talking about." },
+];
+
+function RecycleBinBody() {
+  const [selected, setSelected] = useState(null);
+  const [opened, setOpened] = useState(null);
+  const { setModalWin } = useContext(ModalContext);
+
+  const sunken = "inset 1px 1px 0 #808080, inset -1px -1px 0 #fff, inset 2px 2px 0 #404040, inset -2px -2px 0 #dfdfdf";
+
+  const totalKb = RECYCLE_FILES.reduce((s, f) => s + f.kb, 0);
+  const statusLeft = selected === null
+    ? `${RECYCLE_FILES.length} object(s)`
+    : "1 object(s) selected";
+  const statusRight = selected === null
+    ? `${totalKb} KB`
+    : `${RECYCLE_FILES[selected].kb} KB`;
+
+  // Register as the app-modal window while a file dialog is open so the window
+  // manager greys our titlebar and blocks close/minimize/maximize.
+  useEffect(() => {
+    setModalWin(opened ? "recyclebin" : null);
+    return () => setModalWin(null);
+  }, [opened, setModalWin]);
+
+  return (
+    <div style={{ position: "relative", display: "flex", flexDirection: "column", height: "100%", overflow: "hidden", background: "#c0c0c0", color: "#000", userSelect: "none" }}>
+
+      {/* Menu bar */}
+      <div style={{ height: 20, flexShrink: 0, display: "flex", alignItems: "center", padding: "2px 2px 0", fontSize: 13, cursor: "default" }}>
+        {["File", "Edit", "View", "Help"].map(m => (
+          <span key={m} style={{ padding: "1px 7px" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#000080"; e.currentTarget.style.color = "#fff"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#000"; }}>
+            <span style={{ textDecoration: "underline" }}>{m[0]}</span>{m.slice(1)}
+          </span>
+        ))}
+      </div>
+
+      {/* File area */}
+      <div
+        onMouseDown={() => setSelected(null)}
+        style={{ flex: 1, minHeight: 0, overflowY: "auto", margin: "2px 3px 3px", boxShadow: sunken, background: "#fff", padding: 12 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignContent: "flex-start" }}>
+          {RECYCLE_FILES.map((f, i) => {
+            const sel = selected === i;
+            return (
+              <div key={f.name}
+                onMouseDown={e => { e.stopPropagation(); setSelected(i); }}
+                onDoubleClick={() => setOpened(f)}
+                style={{ width: 88, display: "flex", flexDirection: "column", alignItems: "center", padding: 4, cursor: "default" }}>
+                <div style={{ padding: 1, background: sel ? "#000080" : "transparent" }}>
+                  <img src={f.icon} alt="" style={{ width: 48, height: 48, objectFit: "contain", imageRendering: "pixelated", display: "block" }} />
+                </div>
+                <span style={{ marginTop: 3, padding: "1px 3px", fontSize: 12, textAlign: "center", lineHeight: 1.2,
+                  background: sel ? "#000080" : "transparent", color: sel ? "#fff" : "#000",
+                  outline: sel ? "1px dotted #fff" : "none", wordBreak: "break-word" }}>
+                  {f.name}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Status bar */}
+      <div style={{ height: 20, flexShrink: 0, display: "flex", gap: 3, padding: "0 3px 3px" }}>
+        <div style={{ flex: 1, boxShadow: "inset 1px 1px 0 #808080, inset -1px -1px 0 #fff", padding: "2px 8px", fontSize: 12, display: "flex", alignItems: "center" }}>{statusLeft}</div>
+        <div style={{ width: 120, boxShadow: "inset 1px 1px 0 #808080, inset -1px -1px 0 #fff", padding: "2px 8px", fontSize: 12, display: "flex", alignItems: "center" }}>{statusRight}</div>
+      </div>
+
+      {/* "Open file" easter-egg dialog — built from the same Win95 components
+          as every other window, and app-modal (blocks the parent window). */}
+      {opened && (
+        <div onMouseDown={e => e.stopPropagation()}
+          style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 5 }}>
+          <Win style={{ width: 320 }}>
+            <GradientHeader active $active>
+              <TitleText>{opened.name}</TitleText>
+              <TitleButtons>
+                <TitleBtn onClick={() => setOpened(null)}><CloseGlyph>✕</CloseGlyph></TitleBtn>
+              </TitleButtons>
+            </GradientHeader>
+            <WindowContent style={{ padding: 14 }}>
+              <div style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 18 }}>
+                <img src="/assets/shared/info-icon.png" alt="" style={{ width: 32, height: 32, imageRendering: "pixelated", flexShrink: 0 }} />
+                <div style={{ fontSize: 13, lineHeight: 1.5, whiteSpace: "pre-wrap", paddingTop: 6 }}>{opened.note}</div>
+              </div>
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <Button onClick={() => setOpened(null)} style={{ minWidth: 88 }}>OK</Button>
+              </div>
+            </WindowContent>
+          </Win>
+        </div>
+      )}
+
+    </div>
+  );
+}
+
 const BODIES = {
   welcome:     <WelcomeBody />,
   about:       <AboutBody />,
@@ -1826,6 +1939,7 @@ const BODIES = {
   gallery:     <GalleryBody />,
   minesweeper: <MinesweeperBody />,
   email:       <EmailBody />,
+  recyclebin:  <RecycleBinBody />,
   sapling:     <SaplingAd />,
   mario:       <MarioAd />,
   stalk:       <StalkAd />,
@@ -1842,6 +1956,7 @@ export default function App() {
       gallery:      { open: false, min: false, max: false, x: 120, y: 60,  z: 1, prev: null },
       minesweeper:  { open: false, min: false, max: false, x: 180, y: 70,  z: 1, prev: null },
       email:        { open: false, min: false, max: false, x: 200, y: 80,  z: 1, prev: null },
+      recyclebin:   { open: false, min: false, max: false, x: 240, y: 120, z: 1, prev: null },
       about:        { open: false, min: false, max: false, x: 140, y: 70,  z: 1, prev: null },
       projects:  { open: false, min: false, max: false, x: 200,      y: 90,      z: 1,  prev: null },
       bank:      { open: false, min: false, max: false, x: 320,      y: 160,     z: 1,  prev: null },
@@ -1853,6 +1968,7 @@ export default function App() {
   });
   const [activeId, setActiveId]   = useState("welcome");
   const [startOpen, setStartOpen] = useState(false);
+  const [modalWin, setModalWin]   = useState(null);
   const [selectedIcon, setSelectedIcon] = useState(null);
   const [time, setTime] = useState("");
   const zTop = useRef(10);
@@ -1962,8 +2078,11 @@ export default function App() {
     else focusWin(id);
   };
 
+  const modalCtx = useMemo(() => ({ modalWin, setModalWin }), [modalWin]);
+
   return (
     <ThemeProvider theme={theme}>
+      <ModalContext.Provider value={modalCtx}>
       <GlobalStyles />
       <Wallpaper ref={wallpaperRef} src={getWallpaperSrc()} autoPlay loop muted playsInline />
 
@@ -2080,6 +2199,7 @@ export default function App() {
           </Toolbar>
         </Taskbar>
       </Desktop>
+      </ModalContext.Provider>
     </ThemeProvider>
   );
 }
