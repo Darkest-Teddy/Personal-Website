@@ -68,6 +68,15 @@ const Wallpaper = styled.video`
   object-fit: cover; z-index: -1;
 `;
 
+/* Day wallpaper 06:00–19:30 local time, night wallpaper otherwise. */
+const DAY_WALLPAPER = "/assets/shared/wallpaper.mp4";
+const NIGHT_WALLPAPER = "/assets/shared/wallpaper-night.mp4";
+const getWallpaperSrc = () => {
+  const now = new Date();
+  const mins = now.getHours() * 60 + now.getMinutes();
+  return mins >= 6 * 60 && mins < 19 * 60 + 30 ? DAY_WALLPAPER : NIGHT_WALLPAPER;
+};
+
 const Desktop = styled.div`
   position: relative; width: 100%; height: 100%; overflow: hidden;
 `;
@@ -655,7 +664,7 @@ const ABOUT_EXP = [
 const ABOUT_HACKS = [
   { name:"Waymark", date:"May 2026", win:"Best Overall · Red Hat Open Accelerator", stack:"Llama 3.1 8B · Python · React · ChromaDB", desc:"Multimodal RAG over Google Drive and Slack, delivering sub-2s answers at 93.6% accuracy across 847 documents.", logo:"/assets/about/logo-openaccel.png", logoBg:"#fff" },
   { name:"Sapling", date:"Feb 2026", win:"AI Tutor Track Winner · BU CivicHacks 2026", stack:"Next.js · FastAPI · D3.js · WebSockets", desc:"Open-source AI study platform with Socratic, expository, and teach-back modes plus a real-time knowledge graph.", logo:"/assets/about/logo-civichacks.png", logoBg:"#0a0a0a" },
-  { name:"Stalk Market", date:"Oct 2025", win:"Best Technical Execution · BU Data Science + X", stack:"OpenAI · Python · JavaScript", desc:"Stock market simulation with Geometric Brownian Motion pricing and adaptive AI trading agents.", logo:"/assets/about/logo-dsx.png", logoBg:"#1a1a2e" },
+  { name:"Stalk Market", date:"Oct 2025", win:"Best Technical Execution · BU Data Science + X", stack:"OpenAI · Python · JavaScript", desc:"Stock market simulation with Geometric Brownian Motion pricing and adaptive AI trading agents.", logo:"/assets/about/logo-dsx.png", logoBg:"#1a1a2e", logoAspect:"561/301" },
   { name:"Super Artificial Bros.", date:"Oct 2025", win:"Best Use of AI & LLMs · BostonHacks 2025", stack:"Gemini API · Python · JavaScript · Node.js", desc:"AI-generated Mario game with procedural levels and an NPC relationship system.", logo:"/assets/about/logo-bostonhacks.png", logoBg:"#65b0f1" },
 ];
 const ABOUT_AWARDS = [
@@ -809,7 +818,7 @@ function AboutBody() {
                   {ABOUT_HACKS.map((h, i) => (
                     <div key={i} style={{ background:"#fff", boxShadow:raised, padding:"10px 12px", display:"flex", gap:12, alignItems:"flex-start" }}>
                       <div style={{ width:112, flexShrink:0, display:"flex", justifyContent:"center" }}>
-                        <div style={{ width: h.name === "Super Artificial Bros." ? 86 : 112, height:64, padding:3, boxShadow:sunken, background:h.logoBg, overflow:"hidden" }}>
+                        <div style={{ width: h.name === "Super Artificial Bros." ? 86 : 112, ...(h.logoAspect ? { aspectRatio: h.logoAspect } : { height: 64 }), padding:3, boxShadow:sunken, background:h.logoBg, overflow:"hidden" }}>
                           <img src={h.logo} alt={h.name} style={{ width:"100%", height:"100%", objectFit:"contain" }}
                             onError={e => { e.target.style.display="none"; }} />
                         </div>
@@ -1851,6 +1860,28 @@ export default function App() {
   const audioCtxRef = useRef(null);
   const chordSound = useRef(null);
   const winsRef = useRef(null);
+  const wallpaperRef = useRef(null);
+
+  // Swap between day/night wallpaper on a local-time boundary, keeping the
+  // incoming clip synced to the outgoing clip's playback position.
+  useEffect(() => {
+    const video = wallpaperRef.current;
+    if (!video) return;
+    const applySrc = src => {
+      if (video.getAttribute("src") === src) return;
+      const at = video.currentTime;
+      const onMeta = () => {
+        video.currentTime = video.duration ? at % video.duration : 0;
+        video.play().catch(() => {});
+        video.removeEventListener("loadedmetadata", onMeta);
+      };
+      video.addEventListener("loadedmetadata", onMeta);
+      video.src = src;
+      video.load();
+    };
+    const id = setInterval(() => applySrc(getWallpaperSrc()), 60000);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1934,9 +1965,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyles />
-      <Wallpaper autoPlay loop muted playsInline>
-        <source src="/assets/shared/wallpaper.mp4" type="video/mp4" />
-      </Wallpaper>
+      <Wallpaper ref={wallpaperRef} src={getWallpaperSrc()} autoPlay loop muted playsInline />
 
       <Desktop onMouseDown={() => { setSelectedIcon(null); if (startOpen) setStartOpen(false); }}>
 
