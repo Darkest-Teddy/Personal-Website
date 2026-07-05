@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useContext, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -55,6 +56,17 @@ const GlobalStyles = createGlobalStyle`
   button:focus { outline: none !important; }
   button:active { background: #b8b8b8 !important; background-image: none !important; }
   b, strong { font-weight: bold !important; }
+
+  /* Custom Windows 95/98 cursor set. Layered by specificity so the more specific
+     rules (text/link/resize) win over the universal arrow, and all beat the
+     inline cursor styles used throughout the app via !important. */
+  * { cursor: url('/assets/cursor/arrow.cur'), auto !important; }
+  input, textarea, [contenteditable="true"] { cursor: url('/assets/cursor/Beam.cur'), text !important; }
+  a, a * { cursor: url('/assets/cursor/Cursor_15.cur'), pointer !important; }
+  [data-testid="resizeHandle"] { cursor: url('/assets/cursor/Cursor_6.cur'), nwse-resize !important; }
+  /* Fake "application starting" cursor, shown briefly while an app launches. */
+  body.app-launching, body.app-launching * { cursor: url('/assets/cursor/Cursor_17.cur'), progress !important; }
+
   ${createScrollbars()}
   ::-webkit-scrollbar { width: 17px; height: 17px; }
   ::-webkit-scrollbar-button { width: 17px; height: 17px; }
@@ -1684,6 +1696,7 @@ function MinesweeperBody() {
 function EmailBody() {
   const [form, setForm] = useState({ from: '', subject: '', message: '' });
   const [status, setStatus] = useState('idle');
+  const { playChimes } = useContext(ModalContext);
 
   const sunken = "inset 1px 1px 0 #808080, inset -1px -1px 0 #fff, inset 2px 2px 0 #404040, inset -2px -2px 0 #dfdfdf";
 
@@ -1693,6 +1706,9 @@ function EmailBody() {
     if (e?.preventDefault) e.preventDefault();
     if (!form.from.trim() || !form.subject.trim() || !form.message.trim()) {
       setStatus('incomplete'); return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.from.trim())) {
+      setStatus('invalid'); return;
     }
     setStatus('sending');
     try {
@@ -1710,6 +1726,7 @@ function EmailBody() {
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.success) {
         setStatus('sent');
+        playChimes();
       } else {
         setErrorMsg(data.message || `HTTP ${res.status}`);
         setStatus('error');
@@ -1744,7 +1761,7 @@ function EmailBody() {
   if (status === 'sent') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 14, fontFamily: "'W95FA', sans-serif", fontSize: 13, background: '#c0c0c0' }}>
-        <img src="/assets/email/Email.png" alt="" style={{ width: 48, height: 48, imageRendering: 'pixelated', objectFit: 'contain' }} />
+        <img src="/assets/email/sent-mail.png" alt="" style={{ width: 56, height: 30, imageRendering: 'pixelated', objectFit: 'contain' }} />
         <p style={{ margin: 0 }}>Message sent!</p>
         <W95Btn onClick={() => { setForm({ from: '', subject: '', message: '' }); setStatus('idle'); }}>New Message</W95Btn>
       </div>
@@ -1811,10 +1828,11 @@ function EmailBody() {
       />
 
       {/* Status — only shown when actionable */}
-      {(status === 'sending' || status === 'error' || status === 'incomplete') && (
+      {(status === 'sending' || status === 'error' || status === 'incomplete' || status === 'invalid') && (
         <div style={{ flexShrink: 0, padding: '2px 5px', fontSize: 12, background: '#c0c0c0', borderTop: '1px solid #808080' }}>
           {status === 'sending'    ? 'Sending...' :
            status === 'error'      ? `Error: ${errorMsg || 'could not send'}` :
+           status === 'invalid'    ? 'Please enter a valid email address.' :
                                      'Please fill in all fields.'}
         </div>
       )}
@@ -1834,8 +1852,7 @@ const RECYCLE_FILES = [
 
 function RecycleBinBody() {
   const [selected, setSelected] = useState(null);
-  const [opened, setOpened] = useState(null);
-  const { setModalWin } = useContext(ModalContext);
+  const { openBinFile } = useContext(ModalContext);
 
   const sunken = "inset 1px 1px 0 #808080, inset -1px -1px 0 #fff, inset 2px 2px 0 #404040, inset -2px -2px 0 #dfdfdf";
 
@@ -1846,13 +1863,6 @@ function RecycleBinBody() {
   const statusRight = selected === null
     ? `${totalKb} KB`
     : `${RECYCLE_FILES[selected].kb} KB`;
-
-  // Register as the app-modal window while a file dialog is open so the window
-  // manager greys our titlebar and blocks close/minimize/maximize.
-  useEffect(() => {
-    setModalWin(opened ? "recyclebin" : null);
-    return () => setModalWin(null);
-  }, [opened, setModalWin]);
 
   return (
     <div style={{ position: "relative", display: "flex", flexDirection: "column", height: "100%", overflow: "hidden", background: "#c0c0c0", color: "#000", userSelect: "none" }}>
@@ -1878,7 +1888,7 @@ function RecycleBinBody() {
             return (
               <div key={f.name}
                 onMouseDown={e => { e.stopPropagation(); setSelected(i); }}
-                onDoubleClick={() => setOpened(f)}
+                onDoubleClick={() => openBinFile(f)}
                 style={{ width: 88, display: "flex", flexDirection: "column", alignItems: "center", padding: 4, cursor: "default" }}>
                 <div style={{ padding: 1, background: sel ? "#000080" : "transparent" }}>
                   <img src={f.icon} alt="" style={{ width: 48, height: 48, objectFit: "contain", imageRendering: "pixelated", display: "block" }} />
@@ -1899,31 +1909,6 @@ function RecycleBinBody() {
         <div style={{ flex: 1, boxShadow: "inset 1px 1px 0 #808080, inset -1px -1px 0 #fff", padding: "2px 8px", fontSize: 12, display: "flex", alignItems: "center" }}>{statusLeft}</div>
         <div style={{ width: 120, boxShadow: "inset 1px 1px 0 #808080, inset -1px -1px 0 #fff", padding: "2px 8px", fontSize: 12, display: "flex", alignItems: "center" }}>{statusRight}</div>
       </div>
-
-      {/* "Open file" easter-egg dialog — built from the same Win95 components
-          as every other window, and app-modal (blocks the parent window). */}
-      {opened && (
-        <div onMouseDown={e => e.stopPropagation()}
-          style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 5 }}>
-          <Win style={{ width: 320 }}>
-            <GradientHeader active $active>
-              <TitleText>{opened.name}</TitleText>
-              <TitleButtons>
-                <TitleBtn onClick={() => setOpened(null)}><CloseGlyph>✕</CloseGlyph></TitleBtn>
-              </TitleButtons>
-            </GradientHeader>
-            <WindowContent style={{ padding: 14 }}>
-              <div style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 18 }}>
-                <img src="/assets/shared/info-icon.png" alt="" style={{ width: 32, height: 32, imageRendering: "pixelated", flexShrink: 0 }} />
-                <div style={{ fontSize: 13, lineHeight: 1.5, whiteSpace: "pre-wrap", paddingTop: 6 }}>{opened.note}</div>
-              </div>
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <Button onClick={() => setOpened(null)} style={{ minWidth: 88 }}>OK</Button>
-              </div>
-            </WindowContent>
-          </Win>
-        </div>
-      )}
 
     </div>
   );
@@ -1971,10 +1956,21 @@ export default function App() {
   const [modalWin, setModalWin]   = useState(null);
   const [selectedIcon, setSelectedIcon] = useState(null);
   const [time, setTime] = useState("");
+  // Recycle Bin "open file" dialog — a system-modal, draggable popup with its
+  // own taskbar tab. Lives at App level so it can block every window and appear
+  // on the taskbar. binFile = the opened file (or null). It can't be minimized.
+  const [binFile, setBinFile] = useState(null);
+  const [binPos, setBinPos] = useState(null); // null = centered; {x,y} = dragged (viewport coords)
+  const binDialogRef = useRef(null);
+  const binDragRef = useRef(null);
+  const [launching, setLaunching] = useState(false); // fake app-startup cursor
+  const launchTimer = useRef(null);
   const zTop = useRef(10);
   const errorSound = useRef(null);
   const audioCtxRef = useRef(null);
   const chordSound = useRef(null);
+  const dingSound = useRef(null);
+  const chimesSound = useRef(null);
   const winsRef = useRef(null);
   const wallpaperRef = useRef(null);
 
@@ -2015,6 +2011,16 @@ export default function App() {
     chord.volume = 1.0;
     chord.load();
     chordSound.current = chord;
+    const ding = new Audio("/assets/shared/ding.mp3");
+    ding.preload = "auto";
+    ding.volume = 1.0;
+    ding.load();
+    dingSound.current = ding;
+    const chimes = new Audio("/assets/shared/chimes.mp3");
+    chimes.preload = "auto";
+    chimes.volume = 1.0;
+    chimes.load();
+    chimesSound.current = chimes;
     const tick = () => setTime(new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }));
     tick();
     const t = setInterval(tick, 1000);
@@ -2029,9 +2035,22 @@ export default function App() {
     setWins(w => ({ ...w, [id]: { ...w[id], z: zTop.current, min: false } }));
   }, []);
 
+  // Briefly show the "application starting" cursor when an app actually launches
+  // (opens fresh, not just re-focuses).
+  const triggerLaunch = useCallback(() => {
+    setLaunching(true);
+    if (launchTimer.current) clearTimeout(launchTimer.current);
+    launchTimer.current = setTimeout(() => setLaunching(false), 800);
+  }, []);
+
   const openWin = useCallback(id => {
     setStartOpen(false);
     setActiveId(id);
+    const cur = winsRef.current;
+    const willLaunch = id === "projects"
+      ? PROJECT_IDS.some(pid => !cur[pid].open)
+      : !cur[id]?.open;
+    if (willLaunch) triggerLaunch();
     setWins(w => {
       let z = zTop.current;
       const next = { ...w, [id]: { ...w[id], open: true, min: false, z: ++z } };
@@ -2063,7 +2082,7 @@ export default function App() {
         chordSound.current.play().catch(() => {});
       }
     }
-  }, []);
+  }, [triggerLaunch]);
 
   const closeWin  = useCallback(id => setWins(w => ({ ...w, [id]: { ...w[id], open: false, min: false, max: false } })), []);
   const minWin    = useCallback(id => { setWins(w => ({ ...w, [id]: { ...w[id], min: true } })); setActiveId(a => a === id ? null : a); }, []);
@@ -2078,7 +2097,48 @@ export default function App() {
     else focusWin(id);
   };
 
-  const modalCtx = useMemo(() => ({ modalWin, setModalWin }), [modalWin]);
+  const openBinFile = useCallback(f => {
+    setBinFile(f); setBinPos(null);
+    if (dingSound.current) { dingSound.current.currentTime = 0; dingSound.current.play().catch(() => {}); }
+  }, []);
+  const closeBinFile = useCallback(() => setBinFile(null), []);
+
+  const playChimes = useCallback(() => {
+    if (chimesSound.current) { chimesSound.current.currentTime = 0; chimesSound.current.play().catch(() => {}); }
+  }, []);
+
+  // While the dialog is open it's app-modal: the Recycle Bin window is greyed
+  // and every window sits under the scrim.
+  useEffect(() => { setModalWin(binFile ? "recyclebin" : null); }, [binFile]);
+
+  // Toggle the body class that swaps in the fake app-startup cursor.
+  useEffect(() => { document.body.classList.toggle("app-launching", launching); }, [launching]);
+  useEffect(() => () => { if (launchTimer.current) clearTimeout(launchTimer.current); }, []);
+
+  // Drag the dialog by its titlebar (viewport coords, since it's portaled to <body>).
+  useEffect(() => {
+    const move = e => {
+      const d = binDragRef.current;
+      if (!d) return;
+      setBinPos({ x: d.ox + (e.clientX - d.startX), y: d.oy + (e.clientY - d.startY) });
+    };
+    const up = () => { binDragRef.current = null; };
+    window.addEventListener("mousemove", move);
+    window.addEventListener("mouseup", up);
+    return () => { window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", up); };
+  }, []);
+
+  const onBinHeaderDown = e => {
+    if (e.target.closest("button")) return;
+    const box = binDialogRef.current;
+    if (!box) return;
+    const b = box.getBoundingClientRect(); // resolves the centering transform → no jump
+    binDragRef.current = { startX: e.clientX, startY: e.clientY, ox: b.left, oy: b.top };
+    setBinPos({ x: b.left, y: b.top });
+    e.preventDefault();
+  };
+
+  const modalCtx = useMemo(() => ({ modalWin, setModalWin, openBinFile, playChimes }), [modalWin, openBinFile, playChimes]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -2193,12 +2253,58 @@ export default function App() {
                   <span>{APPS[id].title}</span>
                 </TaskbarWinBtn>
               ))}
+              {binFile && (
+                <TaskbarWinBtn className="active">
+                  <img src={binFile.icon} alt="" />
+                  <span>{binFile.name}</span>
+                </TaskbarWinBtn>
+              )}
             </TaskbarBtns>
 
             <Clock variant="well">{time}</Clock>
           </Toolbar>
         </Taskbar>
       </Desktop>
+
+      {/* Recycle Bin "open file" easter-egg dialog — built from the same Win95
+          components as every other window. Portaled to <body> over a full-screen
+          (transparent) scrim so it's system-modal: every other window is
+          unclickable until it's dismissed, without dimming the desktop. Draggable
+          by its titlebar, and represented by its own taskbar tab. It can't be
+          minimized — it stays up until closed via OK or the ✕. */}
+      {binFile && createPortal(
+        <div onMouseDown={e => e.stopPropagation()}
+          style={{ position: "fixed", inset: 0, zIndex: 100000, background: "transparent" }}>
+          <div
+            ref={binDialogRef}
+            onMouseDown={e => e.stopPropagation()}
+            style={{
+              position: "absolute", width: 320,
+              ...(binPos
+                ? { left: binPos.x, top: binPos.y }
+                : { left: "50%", top: "50%", transform: "translate(-50%, -50%)" }),
+            }}>
+            <Win style={{ width: "100%" }}>
+              <GradientHeader active $active onMouseDown={onBinHeaderDown} style={{ cursor: "move" }}>
+                <TitleText>{binFile.name}</TitleText>
+                <TitleButtons>
+                  <TitleBtn onClick={closeBinFile}><CloseGlyph>✕</CloseGlyph></TitleBtn>
+                </TitleButtons>
+              </GradientHeader>
+              <WindowContent style={{ padding: 14 }}>
+                <div style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 18 }}>
+                  <img src="/assets/shared/info-icon.png" alt="" style={{ width: 32, height: 32, imageRendering: "pixelated", flexShrink: 0 }} />
+                  <div style={{ fontSize: 13, lineHeight: 1.5, whiteSpace: "pre-wrap", paddingTop: 6 }}>{binFile.note}</div>
+                </div>
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <Button onClick={closeBinFile} style={{ minWidth: 88 }}>OK</Button>
+                </div>
+              </WindowContent>
+            </Win>
+          </div>
+        </div>,
+        document.body
+      )}
       </ModalContext.Provider>
     </ThemeProvider>
   );
