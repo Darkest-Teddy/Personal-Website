@@ -1,3 +1,6 @@
 node_modules
 dist
 .env
+
+# Guestbook DB schema contains the admin UID — keep it local
+src/guestbook/schema.sql

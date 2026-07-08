@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<style>
+  @font-face { font-family:'W95FA'; src:url('./assets/shared/W95FA.otf'); }
+  html, body { margin:0; height:100%; }
+  @keyframes gbcaret { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+  * { cursor: url('./assets/cursor/arrow.cur'), auto; }
+  input, textarea, [contenteditable] { cursor: url('./assets/cursor/Beam.cur'), text; }
+  a, a * { cursor: url('./assets/cursor/Cursor_15.cur'), pointer; }
+  #gb-editor:empty:before { content: attr(data-ph); color:#9a9a9a; }
+  #gb-editor img, .gb-body img { height:20px; width:auto; vertical-align:-5px; margin:0 1px; }
+  .gb-body a { color:#0000ee; }
+  .gb-menu span:hover { background:#000080; color:#fff !important; }
+  ::-webkit-scrollbar { width:16px; height:16px; }
+  ::-webkit-scrollbar-track { background:#c0c0c0; }
+  ::-webkit-scrollbar-thumb { background:#c0c0c0; border:1px solid; border-color:#fff #404040 #404040 #fff; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080; }
+  ::-webkit-scrollbar-button:single-button { background:#c0c0c0; border:1px solid; border-color:#fff #404040 #404040 #fff; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080; height:16px; width:16px; }
+</style>
+<script src="./emoji-set.js"></script>
+</helmet>
+
+<div style="min-height:100vh; box-sizing:border-box; background:#008080; display:flex; justify-content:center; align-items:flex-start; padding:22px 16px; font-family:'W95FA',Tahoma,sans-serif;">
+  <div style="width:600px; max-width:100%; height:calc(100vh - 44px); min-height:520px; display:flex; flex-direction:column; background:#c0c0c0; padding:3px; box-sizing:border-box; border:2px solid; border-color:#dfdfdf #404040 #404040 #dfdfdf; box-shadow:3px 3px 0 rgba(0,0,0,.35);">
+
+    <!-- Title bar -->
+    <div style="flex:none; display:flex; align-items:center; justify-content:space-between; height:22px; padding:0 2px; background:linear-gradient(90deg,#000080,#1084d0); color:#fff;">
+      <span style="display:flex; align-items:center; gap:5px; font-weight:bold; font-size:13px; white-space:nowrap; overflow:hidden;">
+        <img src="./assets/shared/guestbook-cropped.png" alt="" style="width:16px; height:16px; image-rendering:pixelated; object-fit:contain;">
+        Guestbook
+      </span>
+      <span style="display:flex; gap:2px;">
+        <span style="width:17px; height:15px; background:#c0c0c0; border:1px solid; border-color:#ffffff #404040 #404040 #ffffff; box-shadow:inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080; display:flex; align-items:flex-end; justify-content:center; padding-bottom:2px;"><span style="display:block; width:7px; height:2px; background:#000;"></span></span>
+        <span style="width:17px; height:15px; background:#c0c0c0; border:1px solid; border-color:#ffffff #404040 #404040 #ffffff; box-shadow:inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080; display:flex; align-items:center; justify-content:center;"><span style="width:9px; height:8px; border:1px solid #000; border-top-width:2px; box-sizing:border-box;"></span></span>
+        <span style="width:17px; height:15px; background:#c0c0c0; border:1px solid; border-color:#ffffff #404040 #404040 #ffffff; box-shadow:inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; color:#000;">✕</span>
+      </span>
+    </div>
+
+    <!-- Menu bar -->
+    <div class="gb-menu" style="flex:none; display:flex; align-items:center; height:19px; padding:2px 2px 0; font-size:13px; color:#000; user-select:none;">
+      <span style="padding:1px 7px;"><u>F</u>ile</span>
+      <span style="padding:1px 7px;"><u>E</u>dit</span>
+      <span style="padding:1px 7px;"><u>V</u>iew</span>
+      <span style="padding:1px 7px;"><u>H</u>elp</span>
+    </div>
+
+    <!-- Scrollable content -->
+    <div style="flex:1; min-height:0; overflow-y:auto; background:#c0c0c0;">
+      <div style="padding:10px 12px 12px;">
+
+        <div style="text-align:center; font-weight:bold; font-size:24px; color:#000; margin:4px 0 12px; text-transform:capitalize;">Welcome to my guestbook!!</div>
+
+        <!-- Sign form -->
+        <div style="margin-bottom:14px;">
+          <label style="display:block; font-size:13px; color:#000; margin-bottom:3px;">Name:</label>
+          <input type="text" value="{{ name }}" onChange="{{ onName }}" maxLength="40" placeholder="Anonymous" style="width:100%; box-sizing:border-box; height:23px; background:#fff; border:none; outline:none; padding:2px 5px; font-family:'W95FA',Tahoma,sans-serif; font-size:14px; color:#000; box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff, inset 2px 2px 0 #404040, inset -2px -2px 0 #dfdfdf;">
+
+          <div style="display:flex; gap:8px; margin-top:9px;">
+            <div style="flex:1; min-width:0;">
+              <label style="display:block; font-size:13px; color:#000; margin-bottom:3px;">Where ya from <span style="color:#555;">(optional)</span>:</label>
+              <input type="text" value="{{ location }}" onChange="{{ onLoc }}" maxLength="60" placeholder="City, Country" style="width:100%; box-sizing:border-box; height:23px; background:#fff; border:none; outline:none; padding:2px 5px; font-family:'W95FA',Tahoma,sans-serif; font-size:14px; color:#000; box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff, inset 2px 2px 0 #404040, inset -2px -2px 0 #dfdfdf;">
+            </div>
+            <div style="flex:1; min-width:0;">
+              <label style="display:block; font-size:13px; color:#000; margin-bottom:3px;">Your website <span style="color:#555;">(optional)</span>:</label>
+              <input type="text" value="{{ website }}" onChange="{{ onWeb }}" maxLength="80" placeholder="yoursite.com" style="width:100%; box-sizing:border-box; height:23px; background:#fff; border:none; outline:none; padding:2px 5px; font-family:'W95FA',Tahoma,sans-serif; font-size:14px; color:#000; box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff, inset 2px 2px 0 #404040, inset -2px -2px 0 #dfdfdf;">
+            </div>
+          </div>
+
+          <label style="display:block; font-size:13px; color:#000; margin:9px 0 3px;">Message<span style="color:#a00;">*</span>:</label>
+
+          <!-- Toolbar + popovers -->
+          <div id="gb-tools" style="position:relative;">
+            <div style="display:flex; align-items:center; gap:3px; padding:3px; background:#c0c0c0; box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;">
+              <button onMouseDown="{{ hold }}" onClick="{{ doBold }}" title="Bold" style="width:26px; height:24px; display:flex; align-items:center; justify-content:center; background:#c0c0c0; border:1px solid; border-color:#fff #808080 #808080 #fff; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #404040; font-family:'Times New Roman',serif; font-weight:bold; font-size:16px; color:#000; padding:0;">B</button>
+              <button onMouseDown="{{ hold }}" onClick="{{ doItalic }}" title="Italic" style="width:26px; height:24px; display:flex; align-items:center; justify-content:center; background:#c0c0c0; border:1px solid; border-color:#fff #808080 #808080 #fff; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #404040; font-family:'Times New Roman',serif; font-style:italic; font-size:16px; color:#000; padding:0;">I</button>
+
+              <span style="width:1px; height:20px; background:#808080; box-shadow:1px 0 0 #fff; margin:0 2px;"></span>
+
+              <button onMouseDown="{{ hold }}" onClick="{{ toggleSize }}" title="Font size" style="min-width:30px; height:24px; display:flex; align-items:flex-end; justify-content:center; gap:1px; background:#c0c0c0; border:1px solid; border-color:#fff #808080 #808080 #fff; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #404040; color:#000; padding:0 4px 2px;"><span style="font-size:10px; line-height:1;">A</span><span style="font-size:16px; line-height:1;">A</span></button>
+
+              <button onMouseDown="{{ hold }}" onClick="{{ toggleColor }}" title="Font color" style="width:30px; height:24px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#c0c0c0; border:1px solid; border-color:#fff #808080 #808080 #fff; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #404040; padding:0;"><span style="font-family:'Times New Roman',serif; font-weight:bold; font-size:14px; line-height:1; color:#000;">A</span><span style="width:16px; height:3px; margin-top:1px; background:{{ curColor }};"></span></button>
+
+              <button onMouseDown="{{ hold }}" onClick="{{ insertLinkBtn }}" title="Insert link" style="width:28px; height:24px; display:flex; align-items:center; justify-content:center; background:#c0c0c0; border:1px solid; border-color:#fff #808080 #808080 #fff; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #404040; padding:0;">
+                <svg width="16" height="16" viewBox="0 0 16 16"><path d="M6.5 9.5 L9.5 6.5" stroke="#0000cc" stroke-width="1.6" stroke-linecap="round"/><path d="M9 4.2 L10.2 3 a2.6 2.6 0 0 1 3.7 3.7 L12.7 7.9" stroke="#000" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M7 12 L5.8 13.2 a2.6 2.6 0 0 1 -3.7 -3.7 L3.3 8.3" stroke="#000" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+              </button>
+
+              <button onMouseDown="{{ hold }}" onClick="{{ toggleEmoji }}" title="Emoji" style="width:28px; height:24px; display:flex; align-items:center; justify-content:center; background:#c0c0c0; border:1px solid; border-color:#fff #808080 #808080 #fff; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #404040; padding:0;">
+                <img src="{{ smileyIcon }}" alt="" style="width:18px; height:18px; object-fit:contain;">
+              </button>
+            </div>
+
+            <!-- Size popover -->
+            <sc-if value="{{ sizeOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute; top:32px; left:64px; z-index:30; background:#c0c0c0; border:2px solid; border-color:#fff #404040 #404040 #fff; box-shadow:2px 2px 5px rgba(0,0,0,.4); padding:3px; min-width:120px;">
+                <sc-for list="{{ sizes }}" as="s" hint-placeholder-count="4">
+                  <div onMouseDown="{{ hold }}" onClick="{{ s.pick }}" style="padding:4px 10px; font-size:{{ s.px }}; color:#000;">{{ s.label }}</div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <!-- Color popover -->
+            <sc-if value="{{ colorOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute; top:32px; left:96px; z-index:30; background:#c0c0c0; border:2px solid; border-color:#fff #404040 #404040 #fff; box-shadow:2px 2px 5px rgba(0,0,0,.4); padding:5px;">
+                <div style="display:grid; grid-template-columns:repeat(6,18px); gap:3px;">
+                  <sc-for list="{{ colors }}" as="c" hint-placeholder-count="12">
+                    <div onMouseDown="{{ hold }}" onClick="{{ c.pick }}" title="{{ c.hex }}" style="width:18px; height:18px; background:{{ c.hex }}; border:1px solid; border-color:#808080 #fff #fff #808080;"></div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
+            <!-- Emoji popover -->
+            <sc-if value="{{ emojiOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute; top:32px; right:0; z-index:30; background:#c0c0c0; border:2px solid; border-color:#fff #404040 #404040 #fff; box-shadow:2px 2px 5px rgba(0,0,0,.4); padding:5px; width:262px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; padding:0 1px;">
+                  <span style="font-size:11px; color:#000;">Insert emoji</span>
+                  <span style="font-size:10px; color:#555;">classic smileys</span>
+                </div>
+                <div style="display:grid; grid-template-columns:repeat(8,1fr); gap:2px; background:#fff; box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff; padding:4px;">
+                  <sc-for list="{{ emojis }}" as="e" hint-placeholder-count="24">
+                    <div onMouseDown="{{ hold }}" onClick="{{ e.pick }}" title="{{ e.t }}" style="display:flex; align-items:center; justify-content:center; padding:2px; border-radius:2px;">
+                      <img src="{{ e.u }}" alt="{{ e.t }}" style="width:24px; height:24px; object-fit:contain;">
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+
+          <!-- Editor -->
+          <div id="gb-editor" contenteditable="true" data-ph="Say something nice..." onInput="{{ syncText }}" style="min-height:88px; max-height:170px; overflow-y:auto; background:#fff; padding:6px 8px; font-family:'W95FA',Tahoma,sans-serif; font-size:14px; line-height:1.5; color:#000; outline:none; box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff, inset 2px 2px 0 #404040, inset -2px -2px 0 #dfdfdf; word-break:break-word;"></div>
+
+          <div style="display:flex; align-items:center; gap:10px; margin-top:9px;">
+            <button onClick="{{ send }}" disabled="{{ sendDisabled }}" style="height:26px; min-width:78px; padding:0 14px; background:#c0c0c0; border:2px solid; border-color:#fff #808080 #808080 #fff; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #404040; font-family:'W95FA',Tahoma,sans-serif; font-size:14px; color:{{ sendColor }};">Sign it!</button>
+            <sc-if value="{{ justSent }}" hint-placeholder-val="{{ false }}">
+              <span style="display:flex; align-items:center; gap:5px; font-size:13px; color:#0a6b2e;"><img src="{{ heartIcon }}" alt="" style="width:16px; height:16px; object-fit:contain;"> Thanks for signing!</span>
+            </sc-if>
+          </div>
+          <div style="margin-top:6px; font-size:11px; color:#555;">Select text, then use the toolbar for <b>bold</b>, <i>italics</i>, size, color, links &amp; emoji.</div>
+        </div>
+
+        <div style="height:2px; background:#808080; border-bottom:1px solid #fff; margin:4px 0 10px;"></div>
+
+        {{ results }}
+
+      </div>
+    </div>
+
+    <!-- Status bar -->
+    <div style="flex:none; display:flex; gap:3px; padding:2px;">
+      <div style="flex:1; box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff; padding:2px 8px; font-size:12px; color:#000; display:flex; align-items:center;">{{ statusLeft }}</div>
+      <div style="width:160px; box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff; padding:2px 8px; font-size:12px; color:#000; display:flex; align-items:center; gap:5px;"><img src="./assets/shared/icon-ie.png" alt="" style="width:14px; height:14px; image-rendering:pixelated;"> jacklhe.com</div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:640,&quot;height&quot;:800}}">
+class Component extends DCLogic {
+  state = {
+    name: "", location: "", website: "", entries: [], page: 1,
+    hasText: false, pop: null, curColor: "#000000", justSent: false,
+  };
+
+  KEY = "jh-guestbook-v4";
+  PER = 5;
+
+  RAISED = "inset 1px 1px 0 #fff, inset -1px -1px 0 #404040, inset 2px 2px 0 #dfdfdf, inset -2px -2px 0 #808080";
+
+  componentDidMount() {
+    let entries = null;
+    try { const raw = localStorage.getItem(this.KEY); if (raw) entries = JSON.parse(raw); } catch (e) {}
+    if (!entries || !entries.length) entries = this.seed();
+    this.setState({ entries });
+    this._out = (e) => {
+      if (!this.state.pop) return;
+      const box = document.getElementById("gb-tools");
+      if (box && !box.contains(e.target)) this.setState({ pop: null });
+    };
+    document.addEventListener("mousedown", this._out, true);
+    this.forceUpdate();
+  }
+  componentWillUnmount() { if (this._out) document.removeEventListener("mousedown", this._out, true); }
+
+  save(entries) { try { localStorage.setItem(this.KEY, JSON.stringify(entries)); } catch (e) {} }
+
+  emo(n) {
+    const set = window.GB_EMOJIS || [];
+    const f = set.find(x => x.t === n);
+    return f ? '<img src="' + f.u + '" alt="' + n + '">' : "";
+  }
+
+  seed() {
+    const E = this.emo.bind(this);
+    return [
+      { name: "me", location: "Toronto, Canada", website: "", when: "July 2, 2026 at 11:53:38 AM", html: "Sulfur" },
+      { name: "Graveyard Stuffer", location: "Manchester, UK", website: "graveyardstuffer.nekoweb.org", when: "June 25, 2026 at 4:30:34 AM", html: "keep the small web alive " + E("Love") + " thank you for making something with actual soul in it. stay safe out there" },
+      { name: "12th", location: "Seoul, South Korea", website: "", when: "June 24, 2026 at 10:59:42 PM", html: "your website is <b>so cool</b>, really love it so much" },
+      { name: "Covadonga3", location: "Buenos Aires, Argentina", website: "covadonga3.neocities.org", when: "June 24, 2026 at 4:32:31 PM", html: "Hello! I found your page while looking for inspiration for my own site. Very pleasant and exemplary work. Best wishes from South America " + E("Excited") },
+      { name: "ikmalsaid", location: "Kuala Lumpur, Malaysia", website: "", when: "June 13, 2026 at 10:36:57 PM", html: "Just wanted to thank you for all your work.<br>#ikmalsaid was here " + E("Cool") },
+      { name: "Anonymous", location: "", website: "", when: "June 9, 2026 at 10:31:45 PM", html: "I found this place totally by accident and I'm glad I did! It's so cozy and cool " + E("Blush") },
+      { name: "ghostwitch", location: "Portland, USA", website: "", when: "June 7, 2026 at 10:25:10 AM", html: "love your website!! i am looking to build my own and bouncing around for inspiration, and yours is so cool! " + E("Love") },
+      { name: "arcane", location: "Berlin, Germany", website: "arcaneblog.duckdns.org", when: "June 6, 2026 at 7:04:48 AM", html: "nice web site love the style " + E("Smile") + E("Good") },
+      { name: "CrudeOilisbad", location: "Jakarta, Indonesia", website: "nichechinesebaby.github.io/Webling", when: "June 5, 2026 at 9:04:10 AM", html: "helloo.. i currently making my personal website.. xixi " + E("Laugh") + " i got some inspiration here. in my country we don't really have the old geocities stuff, so seeing this makes me want to build more. pray for us " + E("Dance") },
+      { name: "luxy", location: "São Paulo, Brazil", website: "", when: "June 4, 2026 at 7:34:45 PM", html: "i absolutely <font color=\"#c000c0\"><b>love</b></font> this website, it's such an inspiration for me as a web dev " + E("Excited") },
+      { name: "Anon", location: "Prague, Czechia", website: "thomash.xyz", when: "May 31, 2026 at 9:48:00 PM", html: "We need more websites like this on the internet, and less of the repetitive corporate garbage." },
+      { name: "Neo", location: "Melbourne, Australia", website: "neotheone.neocities.org", when: "May 22, 2026 at 6:40:37 AM", html: "I think you got the most amazing &amp; crispy gfx of the entire neocities, great job " + E("Excited") + E("Good") },
+      { name: "dagamerfiles", location: "", website: "", when: "May 21, 2026 at 2:57:55 PM", html: "neato" },
+      { name: "sleepyfox", location: "Dublin, Ireland", website: "", when: "May 18, 2026 at 1:12:09 AM", html: "browsing at 1am and this made me smile. going to bed now " + E("Bored") },
+    ];
+  }
+
+  // ── editor helpers ──
+  editor() { return document.getElementById("gb-editor"); }
+  hold = (e) => {
+    e.preventDefault();
+    const s = window.getSelection();
+    if (s && s.rangeCount) this._range = s.getRangeAt(0).cloneRange();
+  };
+  restore() {
+    const ed = this.editor(); if (!ed) return;
+    ed.focus();
+    if (this._range) {
+      const s = window.getSelection();
+      s.removeAllRanges(); s.addRange(this._range);
+    }
+  }
+  syncText = () => {
+    const ed = this.editor();
+    const t = ed ? (ed.textContent || "").trim() || ed.querySelector("img") : "";
+    const has = !!t;
+    if (has !== this.state.hasText) this.setState({ hasText: has });
+  };
+
+  doBold = () => { this.restore(); document.execCommand("bold"); this.syncText(); };
+  doItalic = () => { this.restore(); document.execCommand("italic"); this.syncText(); };
+
+  pickSize = (px) => {
+    this.restore();
+    document.execCommand("fontSize", false, "7");
+    const ed = this.editor();
+    ed && ed.querySelectorAll("font[size='7']").forEach(f => {
+      f.removeAttribute("size"); f.style.fontSize = px;
+    });
+    this.setState({ pop: null }); this.syncText();
+  };
+  pickColor = (hex) => {
+    this.restore();
+    document.execCommand("styleWithCSS", false, true);
+    document.execCommand("foreColor", false, hex);
+    this.setState({ pop: null, curColor: hex }); this.syncText();
+  };
+  insertEmoji = (u) => {
+    this.restore();
+    document.execCommand("insertHTML", false, '<img src="' + u + '" alt="emoji">');
+    this.syncText();
+  };
+  insertLinkBtn = () => {
+    const url = window.prompt("Link URL:", "https://");
+    if (!url || url === "https://") return;
+    const href = /^https?:\/\//i.test(url) ? url : "https://" + url;
+    this.restore();
+    const sel = window.getSelection();
+    if (sel && sel.isCollapsed) {
+      document.execCommand("insertHTML", false, '<a href="' + href + '" target="_blank" rel="noreferrer">' + href + "</a>&nbsp;");
+    } else {
+      document.execCommand("createLink", false, href);
+      const ed = this.editor();
+      ed && ed.querySelectorAll('a[href="' + href + '"]').forEach(a => { a.target = "_blank"; a.rel = "noreferrer"; });
+    }
+    this.syncText();
+  };
+
+  togglePop = (which) => this.setState(s => ({ pop: s.pop === which ? null : which }));
+
+  onName = (e) => this.setState({ name: e.target.value });
+  onLoc = (e) => this.setState({ location: e.target.value });
+  onWeb = (e) => this.setState({ website: e.target.value });
+
+  fmtNow() {
+    const d = new Date();
+    const day = d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+    const t = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit" });
+    return day + " at " + t;
+  }
+
+  send = () => {
+    const ed = this.editor();
+    const html = ed ? ed.innerHTML.trim() : "";
+    const name = this.state.name.trim() || "Anonymous";
+    if (!html || !(ed.textContent.trim() || ed.querySelector("img"))) return;
+    const entry = { name, location: this.state.location.trim(), website: this.state.website.trim(), when: this.fmtNow(), html };
+    const entries = [entry, ...this.state.entries];
+    this.save(entries);
+    if (ed) ed.innerHTML = "";
+    this.setState({ entries, name: "", location: "", website: "", hasText: false, page: 1, pop: null, justSent: true });
+    try { const a = new Audio("./assets/shared/chimes.mp3"); a.volume = 0.6; a.play().catch(() => {}); } catch (e) {}
+    clearTimeout(this._t); this._t = setTimeout(() => this.setState({ justSent: false }), 3500);
+  };
+
+  normUrl(u) { return /^https?:\/\//i.test(u) ? u : "https://" + u; }
+
+  results() {
+    const h = React.createElement;
+    const { entries, page } = this.state;
+    const total = entries.length;
+    const pages = Math.max(1, Math.ceil(total / this.PER));
+    const cur = Math.min(page, pages);
+    const start = (cur - 1) * this.PER;
+    const shown = entries.slice(start, start + this.PER);
+
+    const cards = shown.map((e, i) => h("div", {
+      key: start + i,
+      style: { background: "#fff", boxShadow: this.RAISED, padding: "9px 11px", marginBottom: 8 },
+    }, [
+      h("div", { key: "hd", style: { display: "flex", alignItems: "baseline", gap: 8, marginBottom: 3 } }, [
+        h("span", { key: "n", style: { fontSize: 15, fontWeight: "bold", color: "#000080" } }, e.name),
+        h("span", { key: "d", style: { marginLeft: "auto", fontSize: 11, color: "#808080", whiteSpace: "nowrap", flexShrink: 0 } }, e.when),
+      ]),
+      (e.location || e.website) ? h("div", { key: "w", style: { fontSize: 12, marginBottom: 5, display: "flex", alignItems: "center", flexWrap: "wrap", gap: "2px 12px" } }, [
+        e.location ? h("span", { key: "loc", style: { display: "flex", alignItems: "center", gap: 3 } }, [
+          h("span", { key: "p", style: { fontSize: 12 } }, "\uD83D\uDCCD"),
+          h("a", { key: "a", href: "https://www.openstreetmap.org/search?query=" + encodeURIComponent(e.location), target: "_blank", rel: "noreferrer", title: "Find on map", style: { color: "#0000ee" } }, e.location),
+        ]) : null,
+        e.website ? h("span", { key: "web", style: { display: "flex", alignItems: "center", gap: 3 } }, [
+          h("span", { key: "l", style: { fontWeight: "bold", color: "#000" } }, "Website:"),
+          h("a", { key: "a", href: this.normUrl(e.website), target: "_blank", rel: "noreferrer", style: { color: "#0000ee" } }, e.website),
+        ]) : null,
+      ]) : null,
+      h("div", { key: "b", className: "gb-body", style: { fontSize: 14, lineHeight: 1.55, color: "#000", wordBreak: "break-word" }, dangerouslySetInnerHTML: { __html: e.html } }),
+    ]));
+
+    // pagination controls
+    const pg = [];
+    const btn = (label, target, active, disabled) => h("span", {
+      key: "p" + label + target,
+      onClick: disabled ? undefined : () => this.setState({ page: target, pop: null }),
+      style: {
+        padding: "0 5px", fontSize: 13, userSelect: "none",
+        cursor: disabled ? "default" : "pointer",
+        color: disabled ? "#808080" : "#0000ee",
+        fontWeight: active ? "bold" : "normal",
+      },
+    }, active ? "[" + label + "]" : label);
+
+    pg.push(btn("\u25C2", cur - 1, false, cur === 1));
+    const maxN = 8;
+    let lo = 1, hi = pages;
+    if (pages > maxN) { lo = Math.max(1, cur - 3); hi = Math.min(pages, lo + maxN - 1); lo = Math.max(1, hi - maxN + 1); }
+    for (let n = lo; n <= hi; n++) pg.push(btn(String(n), n, n === cur, false));
+    pg.push(btn("\u25B8", cur + 1, false, cur === pages));
+
+    return h("div", { key: "res" }, [
+      h("div", { key: "info", style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8, fontSize: 13, color: "#000", flexWrap: "wrap", gap: 6 } }, [
+        h("span", { key: "i" }, "Page " + cur + " of " + pages + " (" + total + " message" + (total === 1 ? "" : "s") + ")"),
+        h("span", { key: "pg", style: { display: "flex", alignItems: "center" } }, pg),
+      ]),
+      h("div", { key: "list" }, cards),
+    ]);
+  }
+
+  renderVals() {
+    const set = window.GB_EMOJIS || [];
+    const smiley = set.find(x => x.t === "Smile") || set[0];
+    const heart = set.find(x => x.t === "Love");
+
+    const emojis = set.map(e => ({ t: e.t, u: e.u, pick: () => this.insertEmoji(e.u) }));
+
+    const colorHexes = ["#000000", "#808080", "#c0c0c0", "#ffffff", "#800000", "#ff0000",
+      "#808000", "#ffff00", "#008000", "#00c000", "#008080", "#00b0b0",
+      "#000080", "#0000ff", "#800080", "#c000c0"];
+    const colors = colorHexes.map(hex => ({ hex, pick: () => this.pickColor(hex) }));
+
+    const sizes = [
+      { label: "Small", px: "11px", pick: () => this.pickSize("11px") },
+      { label: "Normal", px: "14px", pick: () => this.pickSize("14px") },
+      { label: "Large", px: "19px", pick: () => this.pickSize("19px") },
+      { label: "Huge", px: "26px", pick: () => this.pickSize("26px") },
+    ];
+
+    const canSend = this.state.hasText;
+    const total = this.state.entries.length;
+
+    return {
+      name: this.state.name,
+      location: this.state.location,
+      website: this.state.website,
+      onName: this.onName,
+      onLoc: this.onLoc,
+      onWeb: this.onWeb,
+      hold: this.hold,
+      syncText: this.syncText,
+      doBold: this.doBold,
+      doItalic: this.doItalic,
+      insertLinkBtn: this.insertLinkBtn,
+      toggleSize: () => this.togglePop("size"),
+      toggleColor: () => this.togglePop("color"),
+      toggleEmoji: () => this.togglePop("emoji"),
+      sizeOpen: this.state.pop === "size",
+      colorOpen: this.state.pop === "color",
+      emojiOpen: this.state.pop === "emoji",
+      curColor: this.state.curColor,
+      smileyIcon: smiley ? smiley.u : "",
+      heartIcon: heart ? heart.u : "",
+      emojis, colors, sizes,
+      send: this.send,
+      sendDisabled: !canSend,
+      sendColor: canSend ? "#000" : "#808080",
+      justSent: this.state.justSent,
+      statusLeft: total + " message" + (total === 1 ? "" : "s") + " signed",
+      results: this.results(),
+    };
+  }
+}
+</script>
+</body>
+</html>

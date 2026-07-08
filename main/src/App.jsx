@@ -24,6 +24,7 @@ import {
   createScrollbars,
 } from "react95";
 import original from "react95/dist/themes/original";
+import GuestbookBody from "./guestbook/GuestbookBody.jsx";
 
 const theme = {
   ...original,
@@ -478,7 +479,7 @@ function EmailIconNode() {
   );
 }
 
-const WEB3FORMS_KEY = 'e575da3e-474f-4a44-bbee-0dcf9e7b27d1';
+const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY;
 
 /* ── App registry ── */
 const APPS = {
@@ -493,6 +494,7 @@ const APPS = {
   gallery:       { title: "Photo Gallery",  icon: "/assets/gallery/icon-camera.png", width: 760, height: 560, pixel: true },
   minesweeper:   { title: "Minesweeper",    iconNode: <MineIconNode />, icon: "/assets/minesweeper/Minesweeper Logo.png", width: 310, height: 400, gridRow: 5, gridColumn: 1, iconSize: 50 },
   email:         { title: "Send Mail",     iconNode: <EmailIconNode />, icon: "/assets/email/Email.png", width: 500, height: 420 },
+  guestbook:     { title: "Guestbook",     iconNode: <img src="/assets/guestbook/guestbook-cropped.png" alt="" style={{ width: 16, height: 16, imageRendering: "pixelated", objectFit: "contain" }} />, icon: "/assets/guestbook/guestbook-icon.png", width: 600, height: 740, pixel: true },
   recyclebin:    { title: "Recycle Bin",   icon: "/assets/shared/recycle-bin.png", width: 400, height: 320, pixel: true },
   sapling: {
     title: "Sapling", iconNode: <SaplingIcon />, icon: "/assets/sapling/sapling-icon.svg", width: 256,
@@ -519,7 +521,7 @@ const PROJECTS = [
 const TASKBAR_H = 32;
 const MIN_W = 200;
 const MIN_H = 120;
-const BODY_PAD = { welcome: 12, about: 0, projects: 0, bank: 0, resume: 0, updatelog: 0, gallery: 0, minesweeper: 0, email: 0, recyclebin: 0, sapling: 0, mario: 0, stalk: 0 };
+const BODY_PAD = { welcome: 12, about: 0, projects: 0, bank: 0, resume: 0, updatelog: 0, gallery: 0, minesweeper: 0, email: 0, guestbook: 0, recyclebin: 0, sapling: 0, mario: 0, stalk: 0 };
 
 function randomPosition(width, height) {
   const maxX = Math.max(8, window.innerWidth  - width  - 8);
@@ -637,7 +639,7 @@ function Win95Window({ id, win, active, onFocus, onClose, onMin, onMax, onMove, 
 
       <WindowContent style={{
         flex: 1, minHeight: 0,
-        overflow: isProject ? "visible" : (id === "resume" || id === "minesweeper" || id === "email" || id === "recyclebin") ? "hidden" : "auto",
+        overflow: isProject ? "visible" : (id === "resume" || id === "minesweeper" || id === "email" || id === "guestbook" || id === "recyclebin") ? "hidden" : "auto",
         padding: BODY_PAD[id],
         textAlign: id === "welcome" ? "center" : undefined,
         marginBottom: (win.max || isProject) ? 0 : 12,
@@ -1116,6 +1118,11 @@ function BankBody() {
 }
 
 const UPDATE_LOG = [
+  { name: "Guestbook", date: "7/8/26", bullets: [
+    "The guestbook is live. Sign it and leave a message for the whole wide web to see!",
+    "Classic emoticons included",
+    "Tell us where you're from and drop your website if you like",
+  ]},
   { name: "Photos, Mines, & Messages", date: "7/3/26", bullets: [
     "Minesweeper is here baby",
     "Added a photo gallery to showcase pictures of my events, lovely people, and more amazing stuff",
@@ -1924,6 +1931,7 @@ const BODIES = {
   gallery:     <GalleryBody />,
   minesweeper: <MinesweeperBody />,
   email:       <EmailBody />,
+  guestbook:   <GuestbookBody />,
   recyclebin:  <RecycleBinBody />,
   sapling:     <SaplingAd />,
   mario:       <MarioAd />,
@@ -1942,6 +1950,7 @@ export default function App() {
       minesweeper:  { open: false, min: false, max: false, x: 180, y: 70,  z: 1, prev: null },
       email:        { open: false, min: false, max: false, x: 200, y: 80,  z: 1, prev: null },
       recyclebin:   { open: false, min: false, max: false, x: 240, y: 120, z: 1, prev: null },
+      guestbook:    { open: false, min: false, max: false, x: 160, y: 30,  z: 1, prev: null },
       about:        { open: false, min: false, max: false, x: 140, y: 70,  z: 1, prev: null },
       projects:  { open: false, min: false, max: false, x: 200,      y: 90,      z: 1,  prev: null },
       bank:      { open: false, min: false, max: false, x: 320,      y: 160,     z: 1,  prev: null },
