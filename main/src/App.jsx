@@ -25,6 +25,7 @@ import {
 } from "react95";
 import original from "react95/dist/themes/original";
 import GuestbookBody from "./guestbook/GuestbookBody.jsx";
+import VisitorCounter from "./counter/VisitorCounter.jsx";
 
 const theme = {
   ...original,
@@ -2207,6 +2208,8 @@ export default function App() {
             </Win95Window>
           ) : null
         )}
+
+        <VisitorCounter />
 
         {startOpen && (
           <div onMouseDown={e => e.stopPropagation()}
