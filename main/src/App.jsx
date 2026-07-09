@@ -309,6 +309,13 @@ const MINE_ICON_URI = "data:image/svg+xml," + encodeURIComponent(
   '</svg>'
 );
 
+const MS_CELL = 16;
+// Window size that fits a given difficulty's board (board px + chrome).
+function msWindowSize(level) {
+  const { rows, cols } = MS_LEVELS[level];
+  return { w: Math.max(230, cols * MS_CELL + 44), h: rows * MS_CELL + 140 };
+}
+
 const MS_LEVELS = {
   beginner:     { rows: 9,  cols: 9,  mines: 10 },
   intermediate: { rows: 16, cols: 16, mines: 40 },
@@ -1437,7 +1444,7 @@ function GalleryBody() {
           {/* Viewer */}
           {isViewer && cur && (
             <div style={{ height:'100%', overflow:'hidden', background:'#808080', boxShadow:'inset 1px 1px 0 #404040,inset -1px -1px 0 #fff', display:'flex', alignItems:'center', justifyContent:'center', padding:12 }}>
-              <img src={cur.src} alt="" style={{ display:'block', width:'calc(100% - 24px)', height:'calc(100% - 24px)', objectFit:'cover', border:'5px solid #fff', boxShadow:'3px 3px 10px rgba(0,0,0,.55)', transform:`scale(${st.zoom}) rotate(${st.rot}deg)`, transition:'transform 0.08s ease' }} onError={e=>{ e.target.alt='Image not found'; }}/>
+              <img src={cur.src} alt="" style={{ display:'block', maxWidth:'calc(100% - 24px)', maxHeight:'calc(100% - 24px)', width:'auto', height:'auto', objectFit:'contain', border:'5px solid #fff', boxShadow:'3px 3px 10px rgba(0,0,0,.55)', transform:`scale(${st.zoom}) rotate(${st.rot}deg)`, transition:'transform 0.08s ease' }} onError={e=>{ e.target.alt='Image not found'; }}/>
             </div>
           )}
 
@@ -1465,6 +1472,7 @@ function MinesweeperBody() {
   const [clickedMine, setClickedMine] = useState(null);
   const [menuOpen, setMenuOpen] = useState(null);
   const timerRef = useRef(null);
+  const { resizeWin } = useContext(ModalContext);
   const playSound = (file) => { try { new Audio(`/assets/minesweeper/${file}`).play(); } catch {} };
 
   const { rows, cols, mines } = MS_LEVELS[level];
@@ -1478,9 +1486,14 @@ function MinesweeperBody() {
     setFlagCount(0);
     setTime(0);
     setClickedMine(null);
-    if (lv) setLevel(lv);
+    if (lv) {
+      setLevel(lv);
+      // Resize the window to fit the new board (e.g. Expert is much wider).
+      const sz = msWindowSize(lv);
+      resizeWin('minesweeper', sz.w, sz.h);
+    }
     playSound('reset.ogg');
-  }, [level]);
+  }, [level, resizeWin]);
 
   useEffect(() => () => clearInterval(timerRef.current), []);
 
@@ -2148,7 +2161,7 @@ export default function App() {
     e.preventDefault();
   };
 
-  const modalCtx = useMemo(() => ({ modalWin, setModalWin, openBinFile, playChimes }), [modalWin, openBinFile, playChimes]);
+  const modalCtx = useMemo(() => ({ modalWin, setModalWin, openBinFile, playChimes, resizeWin }), [modalWin, openBinFile, playChimes, resizeWin]);
 
   return (
     <ThemeProvider theme={theme}>
