@@ -37,14 +37,14 @@ export default function VisitorCounter() {
 
   const rows = [
     ["Visits:", stats ? fmt(stats.visits) : "…"],
-    ["Uniq. Visitors:", stats ? fmt(stats.unique) : "…"],
+    ["Unique Visitors:", stats ? fmt(stats.unique) : "…"],
     ["On-site:", fmt(onsite)],
   ];
 
   return (
     <div
       style={{
-        position: "fixed", right: 10, bottom: 42, zIndex: 5, width: 178,
+        position: "fixed", right: 10, bottom: 42, zIndex: 5, width: 198,
         background: "#c0c0c0", border: "2px solid", borderColor: "#dfdfdf #404040 #404040 #dfdfdf",
         boxShadow: "2px 2px 0 rgba(0,0,0,.35)", padding: 5,
         fontFamily: "'W95FA', Tahoma, sans-serif", userSelect: "none",
